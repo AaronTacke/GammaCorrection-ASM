@@ -75,6 +75,9 @@ uint8_t* readPicture(char* path){
     int counter = 0;
     uint8_t* pixels = (uint8_t*) malloc(width * height * 3 * sizeof(uint8_t));
 
+    //TODO
+    //Test if malloc returns null to make sure no SegFaults happen
+
     while (!feof(file) && counter < width * height * 3){
         fgets(buffer, NUMBEROFCHARSPERLINE, file);
         pixels[counter] = atoi(buffer);
