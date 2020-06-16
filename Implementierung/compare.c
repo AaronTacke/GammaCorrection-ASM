@@ -24,18 +24,18 @@ void calculate(uint8_t *arr, int width, int height, float gamma){
 }
 
 //A test implementation that prints the result of calculate
-int main(int argc, char** argv) {
-	int length = 256;
-	float gamma = 1.5;
-	uint8_t x[3*length];
-	for(int i = 0; i < length; i++){
-		x[3*i] = (i/3)*3;
-		x[3*i+1] = (i/3)*3;
-		x[3*i+2] = (i/3)*3;
-	}
-	calculate(x, length, 1, gamma);
-	for(int i = 0; i < length; i++){
-		printf("%u, %u, %u\n", x[3*i],x[3*i+1],x[3*i+2]);
-	}
-	return 0;
-}
+//int main(int argc, char** argv) {
+//	int length = 256;
+//	float gamma = 1.5;
+//	uint8_t x[3*length];
+//	for(int i = 0; i < length; i++){
+//		x[3*i] = (i/3)*3;
+//		x[3*i+1] = (i/3)*3;
+//		x[3*i+2] = (i/3)*3;
+//	}
+//	calculate(x, length, 1, gamma);
+//	for(int i = 0; i < length; i++){
+//		printf("%u, %u, %u\n", x[3*i],x[3*i+1],x[3*i+2]);
+//	}
+//	return 0;
+//}

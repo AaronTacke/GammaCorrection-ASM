@@ -118,12 +118,12 @@ int writePicture(char* path, uint8_t image[]){
  * Vielleicht ist es doch sinnvolle ein neues Array mit den Grauwerten zu erstellen, weil dies dann nur ein drittel der Pixel
  * enthält
  */
-int main() {
-    uint8_t* pixels = readPicture("C://Test//bild2.ppm");
-    char* path = "C://Test//umgewandelt.ppm";
-    writePicture(path, pixels);
-    free(pixels);
-    return 0;
-}
+//int main() {
+//    uint8_t* pixels = readPicture("C://Test//bild2.ppm");
+//    char* path = "C://Test//umgewandelt.ppm";
+//    writePicture(path, pixels);
+//    free(pixels);
+//    return 0;
+//}
 
 
