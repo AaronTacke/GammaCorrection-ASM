@@ -88,7 +88,7 @@ uint8_t* readPicture(char* path){
     }
     return pixels;
 }
-void writePicture(char* path, uint8_t image[]){
+int writePicture(char* path, uint8_t image[]){
     FILE *file = fopen(path, "w");
     if (file != NULL) {
         //Write first two lines in file
@@ -104,8 +104,10 @@ void writePicture(char* path, uint8_t image[]){
             fprintf(file, "%d\n", image[i]);
         }
         fclose(file);
+        return 0;
     } else{
         printf("Error by writing in file");
+        return -1;
     }
 }
 
