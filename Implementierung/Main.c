@@ -5,7 +5,17 @@
 #include "Test.h"
 #include "ReadAndWritePPM.h"
 
+
+//Later replaced with Assembler file:
+#include "compare.h"
+void replaceWithAssembler(uint8_t* picture,int width,int height,float gamma){
+    calculate(picture,width,height,gamma);
+}
+
+
+
 void printUsage(char *name){
+    //Add more help information
     printf("Usage: %s [-p path] [-g gamma] [-t]\n", name);
 }
 
@@ -52,10 +62,14 @@ int main(int argc, char *argv[]){
             exit(EXIT_FAILURE);
         }
 
-        //int8_t* picture = readPicture(pathToImage);
-        //execute the calulations
-        //writePicture()
-
+        uint8_t* picture = readPicture(pathToImage);
+        replaceWithAssembler(picture, width, height, gamma);
+        char path[] = "./result.ppm";
+        //TODO Later replaced with resultPath flag.
+        if(writePicture(path, picture)!=0){
+            printf("Error when saving imgae.");
+            exit(EXIT_FAILURE);
+        }
         exit(EXIT_SUCCESS);
     }
     //Test Execution (testFlag = 1)

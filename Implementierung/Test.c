@@ -58,14 +58,13 @@ uint8_t* copyTestArray(uint8_t* arr){
 //Compares the different results, shows differences if they occur
 int evaluateTestResults(uint8_t* original, uint8_t* compare, uint8_t* result){
     int correctCounter = 0;
-    printf("Testing pixels");
+    printf("Testing pixels...");
     for(int i = 0; i < (width*height); i++){
         //Compare every pixel
         if(*(compare+3*i) == *(result+3*i) &&
            *(compare+3*i+1) == *(result+3*i+1) &&
            *(compare+3*i+2) == *(result+3*i+2)){
             correctCounter++;
-            printf(".");
         }else{
             //When wrong print the error
             printf("Pixel(%u,%u,%u): expected: (%u,%u,%u), was: (%u,%u,%u)\n",
@@ -115,7 +114,7 @@ int testImageGamma(uint8_t* original, float gamma){
 
 //Test the standard image with different gamma values
 int test(){
-    for(float i = 0.2; i < 2; i+=0.2){
+    for(float i = 0.2; i <= 2.1; i+=0.2){
         //Test with different gamma values
         if(testGamma(i)!=0){
             //If one tests fails the whole test fails.
@@ -132,7 +131,7 @@ int test(){
 int testImage(char* path){
     //load the image
     uint8_t* original = readPictureTest(path);
-    for(float i = 0.2; i < 2; i+=0.2){
+    for(float i = 0.2; i <= 2.1; i+=0.2){
         //test copies of the image with different gamma values
         if(testImageGamma(copyTestArray(original), i)!=0){
             //If one tests fails the whole test fails.
