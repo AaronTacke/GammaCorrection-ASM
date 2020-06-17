@@ -8,91 +8,98 @@
 
 //Later replaced with Assembler file:
 #include "compare.h"
-void replaceWithAssembler(uint8_t* picture,int width,int height,float gamma){
+
+
+void replaceWithAssembler(uint8_t* picture, int width, int height, float gamma){
     calculate(picture,width,height,gamma);
 }
 
 
-
-void printUsage(char *name){
+void printUsageAndExit(char *name){
     //Add more help information
-    printf("Usage: %s [-p path] [-g gamma] [-t]\n", name);
+    printf("Usage: %s [-i inputPath] [-g gamma] [-o outputPath] [-t] [-b]\n", name);
+    exit(EXIT_FAILURE);
+}
+
+void checkForValidArgument(char *programName, char operationName) {
+    if (optarg[0] == 45){
+        printf("Missing argument for option: -%c\n", operationName);
+        printUsageAndExit(programName);
+    }
 }
 
 int main(int argc, char *argv[]){
     char *name = argv[0];
-    char* pathToImage = "";
+    char *inputPath;
+    char *outputPath;
     int testFlag = 0;
+    int benchmarkFlag = 0;
     //set gamma to 1 as default value
     float gamma = 1;
     char opt;
 
     if (argc < 2){
-        printUsage(name);
-        exit(EXIT_FAILURE);
+        printUsageAndExit(name);
     }
-    while ((opt = getopt(argc, argv, "p:g:t")) != -1) {
+    while ((opt = getopt(argc, argv, "i:g:to:b")) != -1) {
         switch (opt) {
-            case 'p':
-                //avoid reading the next flag as argument; 45 is ascii code for "-"
-                if (optarg[0] == 45){
-                    //reduce optind so the next flag gets evaluated normally
-                    optind --;
-                    break;
-                }
-                pathToImage = optarg;
+            case 'i':
+                checkForValidArgument(name, opt);
+                inputPath = optarg;
+                break;
+            case 'o':
+                checkForValidArgument(name, opt);
+                outputPath = optarg;
                 break;
             case 'g':
-                //avoid reading the next flag as argument; 45 is ascii code for "-"
-                if (optarg[0] == 45){
-                    //reduce optind so the next flag gets evaluated normally
-                    optind --;
-                    break;
-                }
+                checkForValidArgument(name, opt);
                 gamma = atof(optarg);
                 break;
             case 't':
                 testFlag = 1;
                 break;
+            case 'b':
+                benchmarkFlag = 1;
+                break;
             default:
-                fprintf(stderr, "Usage: %s [-p path] [-g gamma] [-t]\n", name);
+                fprintf(stderr, "Usage: %s [-i inputPath] [-g gamma] [-o outputPath] [-t] [-b]", name);
                 exit(EXIT_FAILURE);
         }
     }
 
     if (testFlag == 0){
-        //Normal execution with testFlag = 0
-        //Check if path is empty
-        if (strcmp(pathToImage, "") == 0) {
-            printf("path was not specified\n");
-            printUsage(name);
-            exit(EXIT_FAILURE);
+        //Normal execution
+        if (inputPath[0] == 0){
+            printf("No input path specified\n");
+            printUsageAndExit(name);
         }
-
-        //Check if gamma was set correctly
+        if (outputPath[0] == 0){
+            printf("No output path specified\n");
+            printUsageAndExit(name);
+        }
+        //Check if gamma is valid
         if (gamma < 0){
-            printf("gamma value was not specified or too small, has to be >= 0\n");
+            printf("gamma value is too small, has to be >= 0\n");
             exit(EXIT_FAILURE);
         }
 
-        uint8_t* picture = readPicture(pathToImage);
+        uint8_t* picture = readPicture(inputPath);
         replaceWithAssembler(picture, width, height, gamma);
-        char path[] = "./result.ppm";
-        //TODO Later replaced with resultPath flag.
-        if(writePicture(path, picture)!=0){
-            printf("Error when saving imgae.");
+        if(writePicture(outputPath, picture)!=0){
+            printf("Error while saving image.");
             exit(EXIT_FAILURE);
         }
         exit(EXIT_SUCCESS);
     }
-    //Test Execution (testFlag = 1)
-    if (strcmp(pathToImage, "") != 0){
+    //Test execution
+    if (inputPath != NULL){
         //test with given image
-        testImage(pathToImage);
+        testImage(inputPath);
         exit(EXIT_SUCCESS);
     }
     //test with standard image
     test();
     exit(EXIT_SUCCESS);
 }
+
 
