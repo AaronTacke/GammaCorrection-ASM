@@ -92,7 +92,7 @@ int main(int argc, char *argv[]){
         exit(EXIT_SUCCESS);
     }
     //Test execution
-    if (inputPath != NULL){
+    if (inputPath[0] != 0){
         //test with given image
         testImage(inputPath);
         exit(EXIT_SUCCESS);
