@@ -13,7 +13,8 @@ int main(int argc, char *argv[]){
     char *name = argv[0];
     char* pathToImage = "";
     int testFlag = 0;
-    float gamma = -1;
+    //set gamma to 1 as default value
+    float gamma = 1;
     char opt;
 
     if (argc < 2){
@@ -23,9 +24,21 @@ int main(int argc, char *argv[]){
     while ((opt = getopt(argc, argv, "p:g:t")) != -1) {
         switch (opt) {
             case 'p':
+                //avoid reading the next flag as argument; 45 is ascii code for "-"
+                if (optarg[0] == 45){
+                    //reduce optind so the next flag gets evaluated normally
+                    optind --;
+                    break;
+                }
                 pathToImage = optarg;
                 break;
             case 'g':
+                //avoid reading the next flag as argument; 45 is ascii code for "-"
+                if (optarg[0] == 45){
+                    //reduce optind so the next flag gets evaluated normally
+                    optind --;
+                    break;
+                }
                 gamma = atof(optarg);
                 break;
             case 't':
@@ -39,16 +52,16 @@ int main(int argc, char *argv[]){
 
     if (testFlag == 0){
         //Normal execution with testFlag = 0
-        //Check if path is empty or another flag (45 is ascii code for "-")
-        if (strcmp(pathToImage, "") == 0 || pathToImage[0] == 45) {
-            printf("no path specified\n");
+        //Check if path is empty
+        if (strcmp(pathToImage, "") == 0) {
+            printf("path was not specified\n");
             printUsage(name);
             exit(EXIT_FAILURE);
         }
 
         //Check if gamma was set correctly
         if (gamma < 0){
-            printf("gamma value was too small, has to be >= 0");
+            printf("gamma value was not specified or too small, has to be >= 0\n");
             exit(EXIT_FAILURE);
         }
 
