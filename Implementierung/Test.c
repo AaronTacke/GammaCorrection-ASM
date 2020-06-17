@@ -1,6 +1,8 @@
 #include <ctype.h>
-#include "compare.c"
-#include "ReadAndWritePPM.c"
+#include <stdlib.h>
+#include <stdio.h>
+#include "compare.h"
+#include "ReadAndWritePPM.h"
 
 static char resultPath[] = "./TestResult.ppm";
 
