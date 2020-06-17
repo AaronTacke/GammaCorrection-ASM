@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
-#include <string.h>
+#include<string.h>
 #include <stdlib.h>
 
 #define NUMBEROFCHARSPERLINE 100
@@ -9,7 +9,7 @@ int height;
 
 int numberOfColorPortions;
 //TODO
-//Fehler beheben, wenn die Datei nicht genügend Zeilen enthält
+//There can be errors, if there are not two values for the width and height
 uint8_t* readPicture(char* path){
     char buffer[NUMBEROFCHARSPERLINE];
     FILE *file = fopen(path, "r");
@@ -19,9 +19,8 @@ uint8_t* readPicture(char* path){
         exit(0);
     }
     //First line
-    if(!feof(file)){
+    if(fgets(buffer, NUMBEROFCHARSPERLINE, file) != NULL){
         const char format[] = "P3\n";
-        fgets(buffer, NUMBEROFCHARSPERLINE, file);
         //If the first line has the wrong format
         if(strcmp(format, buffer) != 0){
             printf("The file has not the ASCII-format!");
@@ -32,14 +31,11 @@ uint8_t* readPicture(char* path){
         exit(0);
     }
     //second line
-    if(!feof(file)){
-        fgets(buffer, NUMBEROFCHARSPERLINE, file);
+    if(fgets(buffer, NUMBEROFCHARSPERLINE, file) != NULL){
         //If the second line is a comment
         if(buffer[0] == '#'){
             //The next line is read
-            if(!feof(file)) {
-                fgets(buffer, NUMBEROFCHARSPERLINE, file);
-            }else{
+            if(fgets(buffer, NUMBEROFCHARSPERLINE, file) == NULL){
                 printf("The file has no pixels");
                 exit(0);
             }
@@ -51,14 +47,18 @@ uint8_t* readPicture(char* path){
 
     //read dimensions
     char delimiter[] = " ";
+    if(strlen(buffer) < 3){
+        printf("There is no width and height");
+        exit(0);
+    }
     char *ptrSpace = strtok(buffer, delimiter);
+
     width = atoi(ptrSpace);
     ptrSpace = strtok(NULL, delimiter);
     height = atoi(ptrSpace);
 
     //numberOfColorPortions is set
-    if(!feof(file)){
-        fgets(buffer, NUMBEROFCHARSPERLINE, file);
+    if(fgets(buffer, NUMBEROFCHARSPERLINE, file) != NULL){
         numberOfColorPortions = atoi(buffer);
         //If the image has the not 255 as maxValue
         if(numberOfColorPortions != 255){
@@ -75,23 +75,19 @@ uint8_t* readPicture(char* path){
     int counter = 0;
     uint8_t* pixels = (uint8_t*) malloc(width * height * 3 * sizeof(uint8_t));
 
-    //TODO
-    //Test if malloc returns null to make sure no SegFaults happen
-
-    while (!feof(file) && counter < width * height * 3){
-        fgets(buffer, NUMBEROFCHARSPERLINE, file);
+    while ((fgets(buffer, NUMBEROFCHARSPERLINE, file) != NULL) && (counter < width * height * 3)){
         pixels[counter] = atoi(buffer);
         counter++;
     }
     //Check if counter == numberOfPixels
     if(counter != width * height * 3){
-        printf("The format of the image was wrong expected number of values: %d got number values: %d\n",  width * height * 3, counter );
+        printf("The format of the image was wrong. Expected number of values: %d got number values: %d\n",  width * height * 3, counter );
         free(pixels);
         exit(0);
     }
     return pixels;
 }
-int writePicture(char* path, uint8_t image[]){
+void writePicture(char* path, uint8_t image[]){
     FILE *file = fopen(path, "w");
     if (file != NULL) {
         //Write first two lines in file
@@ -107,23 +103,18 @@ int writePicture(char* path, uint8_t image[]){
             fprintf(file, "%d\n", image[i]);
         }
         fclose(file);
-        return 0;
     } else{
         printf("Error by writing in file");
-        return -1;
     }
 }
 
-/*
- * Vielleicht ist es doch sinnvolle ein neues Array mit den Grauwerten zu erstellen, weil dies dann nur ein drittel der Pixel
- * enthält
- */
-//int main() {
-//    uint8_t* pixels = readPicture("C://Test//bild2.ppm");
-//    char* path = "C://Test//umgewandelt.ppm";
-//    writePicture(path, pixels);
-//    free(pixels);
-//    return 0;
-//}
+int main() {
+    uint8_t* pixels = readPicture("C://Test//bild2.ppm");
+    char* path = "C://Test//umgewandelt.ppm";
+    writePicture(path, pixels);
+    free(pixels);
+    return 0;
+}
+
 
 
