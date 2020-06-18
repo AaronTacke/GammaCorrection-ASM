@@ -90,9 +90,11 @@ int testGamma(float gamma){
     uint8_t* compare = getTestArray();
     calculateTest(result, width, height, gamma);
     compareCalculateTest(compare, width, height, gamma);
-    //Saving the pictures to look at them:
-    writePictureTest(originalPath, original);
-    writePictureTest(resultPath, result);
+    //Saving the picture to look at it with gamma=1
+    if(gamma>0.9 && gamma<1.1) {
+        writePictureTest(originalPath, original);
+        writePictureTest(resultPath, result);
+    }
     //Print information about the test:
     printf("Test with gamma=%f\n",gamma);
     return evaluateTestResults(original, compare, result);
@@ -105,8 +107,9 @@ int testImageGamma(uint8_t* original, float gamma){
     uint8_t* compare = copyTestArray(original);
     calculateTest(result, width, height, gamma);
     compareCalculateTest(compare, width, height, gamma);
-    //Saving the picture to look at it:
-    writePictureTest(resultPath, result);
+    //Saving the picture to look at it with gamma=1
+    if(gamma>0.9 && gamma<1.1)
+        writePictureTest(resultPath, result);
     //Print information about the test:
     printf("Test with gamma=%f\n",gamma);
     return evaluateTestResults(original, compare, result);
