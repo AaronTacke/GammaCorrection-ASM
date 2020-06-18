@@ -14,7 +14,7 @@ void replaceWithAssembler(uint8_t* picture, int width, int height, float gamma){
 
 
 void printUsageAndExit(char *name){
-    //Add more help information
+    //TODO Add more information
     printf("Usage: %s [-i inputPath] [-g gamma] [-o outputPath] [-t] [-b]\n", name);
     exit(EXIT_FAILURE);
 }
@@ -28,7 +28,7 @@ void checkForValidArgument(char *programName, char operationName) {
 
 int main(int argc, char *argv[]){
     char *name = argv[0];
-    char *inputPath;
+    char *inputPath = "";
     char *outputPath = "GammaResult.ppm";
     int testFlag = 0;
     int benchmarkFlag = 0;
@@ -60,14 +60,16 @@ int main(int argc, char *argv[]){
                 benchmarkFlag = 1;
                 break;
             default:
-                fprintf(stderr, "Usage: %s [-i inputPath] [-g gamma] [-o outputPath] [-t] [-b]", name);
-                exit(EXIT_FAILURE);
+                printUsageAndExit(name);
+                //TODO @Philip why did you write this instead of printUsageAndExit(...)?
+                //fprintf(stderr, "Usage: %s [-i inputPath] [-g gamma] [-o outputPath] [-t] [-b]", name);
+                //exit(EXIT_FAILURE);
         }
     }
 
     if (testFlag == 0){
         //Normal execution
-        if (inputPath[0] == 0){
+        if (inputPath[0] == '\0'){
             printf("No input path specified\n");
             printUsageAndExit(name);
         }
@@ -90,7 +92,7 @@ int main(int argc, char *argv[]){
         exit(EXIT_SUCCESS);
     }
     //Test execution
-    if (inputPath[0] != 0){
+    if (inputPath[0] != '\0'){
         //test with given image
         testImage(inputPath);
         exit(EXIT_SUCCESS);
