@@ -6,6 +6,6 @@
 
 #ifndef TEAM141_TEST_H
 #define TEAM141_TEST_H
-int test();
-int testImage(char* path);
+int test(float gamma, char* outputPath);
+int testImage(char* path, float gamma, char* outputPath);
 #endif //TEAM141_TEST_H

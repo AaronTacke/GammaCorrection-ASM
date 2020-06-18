@@ -29,11 +29,11 @@ void checkForValidArgument(char *programName, char operationName) {
 int main(int argc, char *argv[]){
     char *name = argv[0];
     char *inputPath = "";
-    char *outputPath = "GammaResult.ppm";
+    char *outputPath = "";
     int testFlag = 0;
     int benchmarkFlag = 0;
     //set gamma to 1 as default value
-    float gamma = 1;
+    float gamma = -1;
     char opt;
 
     if (argc < 2){
@@ -67,6 +67,14 @@ int main(int argc, char *argv[]){
         }
     }
 
+    if (outputPath[0] == '\0'){
+        if(testFlag==0){
+            outputPath = "GammaResult.ppm";
+        }else{
+            outputPath = "TestResult.ppm";
+        }
+    }
+
     if (testFlag == 0){
         //Normal execution
         if (inputPath[0] == '\0'){
@@ -79,7 +87,7 @@ int main(int argc, char *argv[]){
         }
         //Check if gamma is valid
         if (gamma < 0){
-            printf("gamma value is too small, has to be >= 0\n");
+            printf("Please enter a gamma value (-g) that is >= 0\n");
             exit(EXIT_FAILURE);
         }
 
@@ -91,14 +99,15 @@ int main(int argc, char *argv[]){
         }
         exit(EXIT_SUCCESS);
     }
+
     //Test execution
     if (inputPath[0] != '\0'){
         //test with given image
-        testImage(inputPath);
+        testImage(inputPath, gamma, outputPath);
         exit(EXIT_SUCCESS);
     }
     //test with standard image
-    test();
+    test(gamma, outputPath);
     exit(EXIT_SUCCESS);
 }
 
