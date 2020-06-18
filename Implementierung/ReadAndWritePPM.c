@@ -8,6 +8,14 @@ int width;
 int height;
 
 int numberOfColorPortions;
+
+
+void wrongFormatAndExit(){
+    printf("The file has a wrong format.\n"
+           "Please only use PPM files with the ASCII-format!\n");
+    exit(0);
+}
+
 //TODO
 //There can be errors, if there are not two values for the width and height
 uint8_t* readPicture(char* path){
@@ -15,20 +23,19 @@ uint8_t* readPicture(char* path){
     FILE *file = fopen(path, "r");
 
     if(file == NULL){
-        printf("Was not able to read file!");
+        printf("The file %s was not found.\n", path);
         exit(0);
     }
     //First line
     if(fgets(buffer, NUMBEROFCHARSPERLINE, file) != NULL){
+        //TODO what if there is a space after the P3?
         const char format[] = "P3\n";
         //If the first line has the wrong format
         if(strcmp(format, buffer) != 0){
-            printf("The file has not the ASCII-format!");
-            exit(0);
+            wrongFormatAndExit();
         }
     }else{
-        printf("The format of the file is wrong");
-        exit(0);
+        wrongFormatAndExit();
     }
     //second line
     if(fgets(buffer, NUMBEROFCHARSPERLINE, file) != NULL){
@@ -36,19 +43,20 @@ uint8_t* readPicture(char* path){
         if(buffer[0] == '#'){
             //The next line is read
             if(fgets(buffer, NUMBEROFCHARSPERLINE, file) == NULL){
-                printf("The file has no pixels");
+                printf("The image has no pixels.\n"
+                       "Please only use PPM files with the ASCII-format!\n");
                 exit(0);
             }
         }
     }else{
-        printf("The format of the file is wrong");
-        exit(0);
+        wrongFormatAndExit();
     }
 
     //read dimensions
     char delimiter[] = " ";
     if(strlen(buffer) < 3){
-        printf("There is no width and height");
+        printf("The image does not specify its width and height\n"
+               "Please only use PPM files with the ASCII-format!\n");
         exit(0);
     }
     char *ptrSpace = strtok(buffer, delimiter);
@@ -62,29 +70,39 @@ uint8_t* readPicture(char* path){
         numberOfColorPortions = atoi(buffer);
         //If the image has the not 255 as maxValue
         if(numberOfColorPortions != 255){
-            printf("Only the pixel format with minValue = 0 maxValue = 255 is supported got format: %d", numberOfColorPortions);
+            printf("Only the pixel format with maxValue = 255 is supported.\nFound format with maxValue = %d.\n"
+                   "Please only use PPM files with the ASCII-format!\n", numberOfColorPortions);
             exit(0);
         }
     }else{
-        printf("The file has the wrong format");
         free(ptrSpace);
-        exit(0);
+        wrongFormatAndExit();
     }
 
     //creat pixel array
     int counter = 0;
     uint8_t* pixels = (uint8_t*) malloc(width * height * 3 * sizeof(uint8_t));
 
-    while ((fgets(buffer, NUMBEROFCHARSPERLINE, file) != NULL) && (counter < width * height * 3)){
-        pixels[counter] = atoi(buffer);
+    if(pixels==NULL){
+        //TODO Check if other circumstances (other than a big file) can lead to pixels==null
+        printf("The image is too big. Please choose another file.\n");
+        exit(0);
+    }
+
+    while (fgets(buffer, NUMBEROFCHARSPERLINE, file) != NULL){
+        if(counter < width * height * 3) {
+            pixels[counter] = (uint8_t)(atoi(buffer));
+        }
         counter++;
     }
     //Check if counter == numberOfPixels
     if(counter != width * height * 3){
-        printf("The format of the image was wrong. Expected number of values: %d got number values: %d\n",  width * height * 3, counter );
+        printf("The format of the image was wrong. Expected number of values: %d got number values: %d\n"
+               "Please only use PPM files with the ASCII-format!\n",  width * height * 3, counter );
         free(pixels);
         exit(0);
     }
+
     return pixels;
 }
 void writePicture(char* path, uint8_t image[]){
@@ -104,7 +122,9 @@ void writePicture(char* path, uint8_t image[]){
         }
         fclose(file);
     } else{
-        printf("Error by writing in file");
+        //TODO is this error message correct?
+        printf("Saving the image was not possible.\n The program needs access rights for file %s\n", path);
+        exit(0);
     }
 }
 
