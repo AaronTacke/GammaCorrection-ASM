@@ -173,6 +173,19 @@ int testImage(char *path, float gamma, char* outputPath) {
     printf("Everything worked as expected.\n");
     return 0;
 }
+/*double calculateTime(){
+    int iterations = 100;
+    struct timespec start;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+    for(int i = 0; i < iterations; i++){
+        //Do something
+    }
+    struct timespec end;
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    double duration = end.tv_sec - start.tv_sec + 1e-9 *(end.tv_nsec - start.tv_nsec);
+    double averageTime = duration / iterations;
+    return averageTime;
+}*/
 
 //int main(int argc, char** argv){
 //    test();
