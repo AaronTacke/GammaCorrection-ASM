@@ -63,21 +63,18 @@ int main(int argc, char *argv[]){
                 printUsageAndExit(name);
             default:
                 printUsageAndExit(name);
-                //TODO @Philip why did you write this instead of printUsageAndExit(...)?
-                //fprintf(stderr, "Usage: %s [-i inputPath] [-g gamma] [-o outputPath] [-t] [-b]", name);
-                //exit(EXIT_FAILURE);
         }
     }
 
     if(benchmarkFlag==1 && testFlag==1){
-        printf("Please only use -t (for testing) OR -b (for benchmarking)!");
+        printf("Please only use -t (for testing) OR -b (for benchmarking)!\n");
         printUsageAndExit(name);
     }
 
     if(benchmarkFlag==1){
         //Benchmarking:
         if(outputPath[0] != '\0'){
-            printf("You can not use an output path while benchmarking.");
+            printf("You can not use an output path while benchmarking.\n");
             printUsageAndExit(name);
         }
 
@@ -107,7 +104,7 @@ int main(int argc, char *argv[]){
         uint8_t* picture = readPicture(inputPath);
         replaceWithAssembler(picture, width, height, gamma);
         if(writePicture(outputPath, picture)!=0){
-            printf("Error while saving image.");
+            printf("Error while saving image.\n");
             exit(EXIT_FAILURE);
         }
         exit(EXIT_SUCCESS);
