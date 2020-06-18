@@ -8,8 +8,6 @@
 
 //Later replaced with Assembler file:
 #include "compare.h"
-
-
 void replaceWithAssembler(uint8_t* picture, int width, int height, float gamma){
     calculate(picture,width,height,gamma);
 }
@@ -31,7 +29,7 @@ void checkForValidArgument(char *programName, char operationName) {
 int main(int argc, char *argv[]){
     char *name = argv[0];
     char *inputPath;
-    char *outputPath;
+    char *outputPath = "GammaResult.ppm";
     int testFlag = 0;
     int benchmarkFlag = 0;
     //set gamma to 1 as default value
