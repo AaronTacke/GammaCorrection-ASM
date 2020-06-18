@@ -15,7 +15,7 @@ void replaceWithAssembler(uint8_t* picture, int width, int height, float gamma){
 
 void printUsageAndExit(char *name){
     //TODO Add more information
-    printf("Usage: %s [-i inputPath] [-g gamma] [-o outputPath] [-t] [-b]\n", name);
+    printf("Usage: %s [-i inputPath] [-g gamma] [-o outputPath] [-t] [-b] [-h]\n", name);
     exit(EXIT_FAILURE);
 }
 
@@ -39,7 +39,7 @@ int main(int argc, char *argv[]){
     if (argc < 2){
         printUsageAndExit(name);
     }
-    while ((opt = getopt(argc, argv, "i:g:to:b")) != -1) {
+    while ((opt = getopt(argc, argv, "i:g:to:bh")) != -1) {
         switch (opt) {
             case 'i':
                 checkForValidArgument(name, opt);
@@ -59,12 +59,29 @@ int main(int argc, char *argv[]){
             case 'b':
                 benchmarkFlag = 1;
                 break;
+            case 'h':
+                printUsageAndExit(name);
             default:
                 printUsageAndExit(name);
                 //TODO @Philip why did you write this instead of printUsageAndExit(...)?
                 //fprintf(stderr, "Usage: %s [-i inputPath] [-g gamma] [-o outputPath] [-t] [-b]", name);
                 //exit(EXIT_FAILURE);
         }
+    }
+
+    if(benchmarkFlag==1 && testFlag==1){
+        printf("Please only use -t (for testing) OR -b (for benchmarking)!");
+        printUsageAndExit(name);
+    }
+
+    if(benchmarkFlag==1){
+        //Benchmarking:
+        if(outputPath[0] != '\0'){
+            printf("You can not use an output path while benchmarking.");
+            printUsageAndExit(name);
+        }
+
+        //Benchmarking for different values of inputPath and Gamma!
     }
 
     if (outputPath[0] == '\0'){
@@ -79,10 +96,6 @@ int main(int argc, char *argv[]){
         //Normal execution
         if (inputPath[0] == '\0'){
             printf("No input path specified\n");
-            printUsageAndExit(name);
-        }
-        if (outputPath[0] == 0){
-            printf("No output path specified\n");
             printUsageAndExit(name);
         }
         //Check if gamma is valid
