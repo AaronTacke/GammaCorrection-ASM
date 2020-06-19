@@ -58,9 +58,11 @@ int main(int argc, char *argv[]){
                 break;
             case 'b':
                 benchmarkFlag = 1;
+                //TODO could -b have an OPTIONAL parameter with numbers of iterations?
                 break;
             case 'h':
                 printUsageAndExit(name);
+                break;
             default:
                 printUsageAndExit(name);
         }
