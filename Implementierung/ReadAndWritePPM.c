@@ -65,11 +65,11 @@ uint8_t* readPicture(char* path){
     ptrSpace = strtok(NULL, delimiter);
     height = atoi(ptrSpace);
 
-    if(width<1 || heigh<1){
+    if(width<1 || height<1) {
         printf("The image does not specify its width and height\n"
                "Please only use PPM files with the ASCII-format!\n");
         exit(0);
-
+    }
 
     //numberOfColorPortions is set
     if(fgets(buffer, NUMBEROFCHARSPERLINE, file) != NULL){
