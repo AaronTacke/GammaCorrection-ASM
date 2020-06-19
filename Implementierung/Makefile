@@ -2,7 +2,7 @@
 CFLAGS=-O3 -g -Wall -Wextra
 
 gamma: Main.c compare.c ReadAndWritePPM.c Test.c
-	gcc $(CFLAGS) -o $@ $^
+	gcc $(CFLAGS) -o $@ $^ -lm
 
 .PHONY: clean
 clean:
