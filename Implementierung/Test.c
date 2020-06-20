@@ -1,14 +1,16 @@
 #include <ctype.h>
+#include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "compare.h"
 #include "ReadAndWritePPM.h"
 #include "TestImage.h"
+#include "AssemblerAlternative.h"
 
 
 //Calls method to be tested
 void calculateTest(uint8_t *arr, int width, int height, float gamma) {
-    calculate(arr, width, height, gamma);
+    calculateOptimized(arr, width, height, gamma);
 }
 
 //Calls correct method to compare our results to
@@ -173,19 +175,32 @@ int testImage(char *path, float gamma, char* outputPath) {
     printf("Everything worked as expected.\n");
     return 0;
 }
-/*double calculateTime(){
-    int iterations = 100;
+
+double calculateTime(uint8_t *arr, int width, int height, float gamma, int iterations){
     struct timespec start;
     clock_gettime(CLOCK_MONOTONIC, &start);
     for(int i = 0; i < iterations; i++){
-        //Do something
+        calculateTest(arr, width, height, gamma);
     }
     struct timespec end;
     clock_gettime(CLOCK_MONOTONIC, &end);
     double duration = end.tv_sec - start.tv_sec + 1e-9 *(end.tv_nsec - start.tv_nsec);
     double averageTime = duration / iterations;
     return averageTime;
-}*/
+}
+
+double calculateCompareTime(uint8_t *arr, int width, int height, float gamma, int iterations){
+    struct timespec start;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+    for(int i = 0; i < iterations; i++){
+        compareCalculateTest(arr, width, height, gamma);
+    }
+    struct timespec end;
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    double duration = end.tv_sec - start.tv_sec + 1e-9 *(end.tv_nsec - start.tv_nsec);
+    double averageTime = duration / iterations;
+    return averageTime;
+}
 
 //int main(int argc, char** argv){
 //    test();

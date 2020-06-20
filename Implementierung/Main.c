@@ -4,12 +4,13 @@
 #include <string.h>
 #include "Test.h"
 #include "ReadAndWritePPM.h"
+#include "AssemblerAlternative.h"
 
 
 //Later replaced with Assembler file:
 #include "compare.h"
 void replaceWithAssembler(uint8_t* picture, int width, int height, float gamma){
-    calculate(picture,width,height,gamma);
+    calculateOptimized(picture,width,height,gamma);
 }
 
 
@@ -74,13 +75,26 @@ int main(int argc, char *argv[]){
     }
 
     if(benchmarkFlag==1){
+
+        //TODO Optional parameter for iterations
         //Benchmarking:
         if(outputPath[0] != '\0'){
             printf("You can not use an output path while benchmarking.\n");
             printUsageAndExit(name);
         }
+        uint8_t* arr;
+        if (inputPath[0] != '\0'){
+            //test with given image
+            arr = readPicture(inputPath);
+        }else{
+            arr = getTestArray();
+        }
+        //test with standard image
 
-        //Benchmarking for different values of inputPath and Gamma!
+        double time = calculateTime(arr, width, height, gamma, 100);
+        double compareTime = calculateCompareTime(arr, width, height, gamma, 100);
+        printf("Optimized: %f\nNormal: %f\n",time, compareTime);
+        exit(EXIT_SUCCESS);
     }
 
     if (outputPath[0] == '\0'){

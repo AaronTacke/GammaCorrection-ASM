@@ -8,4 +8,7 @@
 #define TEAM141_TEST_H
 int test(float gamma, char* outputPath);
 int testImage(char* path, float gamma, char* outputPath);
+double calculateTime(uint8_t *arr, int width, int height, float gamma, int iterations);
+double calculateCompareTime(uint8_t *arr, int width, int height, float gamma, int iterations);
+uint8_t *getTestArray();
 #endif //TEAM141_TEST_H
