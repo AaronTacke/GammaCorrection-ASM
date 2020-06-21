@@ -2,8 +2,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-typedef u_int8_t uint8_t;
-
 //An implementation of the calculation to test and compare our assembly code to.
 void calculate(uint8_t *arr, int width, int height, float gamma){
 	//Values for a, b and c are going to be stored seperately later. 

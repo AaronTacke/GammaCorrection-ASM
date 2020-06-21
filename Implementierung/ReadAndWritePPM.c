@@ -3,8 +3,6 @@
 #include<string.h>
 #include <stdlib.h>
 
-typedef u_int8_t uint8_t;
-
 #define NUMBEROFCHARSPERLINE 100
 int width;
 int height;

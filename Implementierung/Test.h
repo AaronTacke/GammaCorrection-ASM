@@ -6,7 +6,6 @@
 
 #ifndef TEAM141_TEST_H
 #define TEAM141_TEST_H
-typedef u_int8_t uint8_t;
 int test(float gamma, char* outputPath);
 int testImage(char* path, float gamma, char* outputPath);
 double calculateTime(uint8_t *arr, int width, int height, float gamma, int iterations);
