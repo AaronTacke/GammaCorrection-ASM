@@ -23,7 +23,8 @@ mov rcx, 0xffff0fffff0cff09
 movq xmm8, rcx
 PSLLDQ xmm8, 8
 mov rcx, 0xffffff06ffff03ff
-movq xmm8, rcx
+movq xmm15, rcx
+por xmm8, xmm15
 //Prepare Byte-Mask for b-PSHUFB
 //0xffff0eff ff0bff08 ffffff05 ffff02ff
 pxor xmm9, xmm9
@@ -31,7 +32,8 @@ mov rcx, 0xffff0effff0bff08
 movq xmm9, rcx
 PSLLDQ xmm9, 8
 mov rcx, 0xffffff05ffff02ff
-movq xmm9, rcx
+movq xmm15, rcx
+por xmm9, xmm15
 //Prepare Byte-Mask for c-PSHUFB
 //0xffff0dff ff0aff07 ffffff04 ffff01ff
 pxor xmm10, xmm10
@@ -39,7 +41,8 @@ mov rcx, 0xffff0dffff0aff07
 movq xmm10, rcx
 PSLLDQ xmm10, 8
 mov rcx, 0xffffff04ffff01ff
-movq xmm10, rcx
+movq xmm15, rcx
+por xmm10, xmm15
 
 //Prepare Byte-Mask for Result PSHUFB
 //0x0e0e0e 0b0b0b 090909 050505 020202 ff
@@ -48,26 +51,30 @@ mov rcx, 0x0e0e0e0b0b0b0909
 movq xmm7, rcx
 PSLLDQ xmm7, 8
 mov rcx, 0x09050505020202ff
-movq xmm7, rcx
+movq xmm15, rcx
+por xmm7, xmm15
 
 //Prepare Byte-Mask for a-multiplicatoin (a=85=0x55)
 pxor xmm11, xmm11
 mov rcx, 0x5500000055
 movq xmm11, rcx
 PSLLDQ xmm11, 8
-movq xmm11, rcx
+movq xmm15, rcx
+por xmm11, xmm15
 //Prepare Byte-Mask for b-multiplicatoin (b=85=0x55)
 pxor xmm12, xmm12
 mov rcx, 0x5500000055 //Doubled because we may change b value
 movq xmm12, rcx
 PSLLDQ xmm12, 8
-movq xmm12, rcx
+movq xmm15, rcx
+por xmm12, xmm15
 //Prepare Byte-Mask for c-multiplicatoin (a=86=0x56)
 pxor xmm13, xmm13
 mov rcx, 0x5600000056
 movq xmm13, rcx
 PSLLDQ xmm13, 8
-movq xmm13, rcx
+movq xmm15, rcx
+por xmm13, xmm15
 
 1://Begin of loop
 cmp rsi, rdi
@@ -79,17 +86,24 @@ movdqa xmm1, [rdi]
 movd ecx, xmm1
 and ecx, 0xf
 
+//MOV R values in xmm1, G values in xmm2, B values in xmm3
 movdqa xmm2, xmm1
 movdqa xmm3, xmm1
 PSHUFB xmm1, xmm8
 PSHUFB xmm2, xmm9
 PSHUFB xmm3, xmm10
+
+//Multiply with a, b and c
 PMULLD xmm1, xmm11
 PMULLD xmm2, xmm12
 PMULLD xmm3, xmm13
+
+//Store results in all bits
 PSHUFB xmm1, xmm7
 PSHUFB xmm2, xmm7
 PSHUFB xmm3, xmm7
+
+//Add registers up
 PADDB xmm1, xmm2
 PADDB xmm1, xmm3
 
