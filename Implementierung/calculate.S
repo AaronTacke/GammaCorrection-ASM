@@ -1,17 +1,17 @@
 .intel_syntax noprefix
-.global _calculate_asm
+.global calculate_asm
 .text
 
-_calculate_asm:
+calculate_asm:
 //Register Usage:
 //rdi: array pointer
 //rsi: width
-//rdi: height
-//rdx: gamma value
+//rdx: height
+//rcx: gamma value
 //rax: return value (pointer to result array)
 mov rax, rdi
 
-imul rsi, rdi
+imul rsi, rdx
 imul rsi, 3
 add rsi, rdi
 //rsi points to first byte that is not part of the array.
@@ -70,8 +70,8 @@ PSLLDQ xmm13, 8
 movq xmm13, rcx
 
 1://Begin of loop
-cmp rdi, rsi
-JGE 1f //End of loop
+cmp rsi, rdi
+JB 1f //End of loop
 
 movdqa xmm1, [rdi]
 
