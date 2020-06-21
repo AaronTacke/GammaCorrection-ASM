@@ -7,6 +7,8 @@
 #include "TestImage.h"
 #include "AssemblerAlternative.h"
 
+typedef u_int8_t uint8_t;
+
 extern uint8_t* calculate_asm(uint8_t* picture, int width, int height, float gamma);
 
 //Calls method to be tested

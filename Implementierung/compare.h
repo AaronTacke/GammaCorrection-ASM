@@ -5,5 +5,6 @@
 
 #ifndef TEAM141_COMPARE_H
 #define TEAM141_COMPARE_H
+typedef u_int8_t uint8_t;
 void calculate(uint8_t *arr, int width, int height, float gamma);
 #endif //TEAM141_COMPARE_H

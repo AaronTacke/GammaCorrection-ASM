@@ -3,6 +3,7 @@
 
 #ifndef TEAM141_GAMMAVALUES_H
 #define TEAM141_GAMMAVALUES_H
+typedef u_int8_t uint8_t;
 float gammaValues[] = {0.0,
 1.0017779E-17,
 1.1450046E-17,

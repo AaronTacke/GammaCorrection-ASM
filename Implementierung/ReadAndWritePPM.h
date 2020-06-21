@@ -6,6 +6,7 @@
 
 #ifndef TEAM141_READANDWRITEPPM_H
 #define TEAM141_READANDWRITEPPM_H
+typedef u_int8_t uint8_t;
 int width;
 int height;
 uint8_t* readPicture(char* path);
