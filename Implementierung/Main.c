@@ -6,11 +6,15 @@
 #include "ReadAndWritePPM.h"
 #include "AssemblerAlternative.h"
 
+typedef u_int8_t uint8_t;
+
+extern uint8_t* calculate_asm(uint8_t* picture, int width, int height, float gamma);
+
 
 //Later replaced with Assembler file:
-#include "compare.h"
 void replaceWithAssembler(uint8_t* picture, int width, int height, float gamma){
-    calculateOptimized(picture,width,height,gamma);
+    //calculateOptimized(picture,width,height,gamma);
+    calculate_asm(picture,width,height,gamma);
 }
 
 
@@ -87,6 +91,7 @@ int main(int argc, char *argv[]){
             //test with given image
             arr = readPicture(inputPath);
         }else{
+            //test with standard image
             arr = getTestArray();
         }
         //test with standard image

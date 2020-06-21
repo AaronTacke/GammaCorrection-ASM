@@ -7,10 +7,11 @@
 #include "TestImage.h"
 #include "AssemblerAlternative.h"
 
+extern uint8_t* calculate_asm(uint8_t* picture, int width, int height, float gamma);
 
 //Calls method to be tested
 void calculateTest(uint8_t *arr, int width, int height, float gamma) {
-    calculateOptimized(arr, width, height, gamma);
+    calculate_asm(arr, width, height, gamma);
 }
 
 //Calls correct method to compare our results to
@@ -181,6 +182,7 @@ double calculateTime(uint8_t *arr, int width, int height, float gamma, int itera
     clock_gettime(CLOCK_MONOTONIC, &start);
     for(int i = 0; i < iterations; i++){
         calculateTest(arr, width, height, gamma);
+        //TODO REPLACE WITH DIRECT FUNCTION
     }
     struct timespec end;
     clock_gettime(CLOCK_MONOTONIC, &end);
@@ -194,6 +196,7 @@ double calculateCompareTime(uint8_t *arr, int width, int height, float gamma, in
     clock_gettime(CLOCK_MONOTONIC, &start);
     for(int i = 0; i < iterations; i++){
         compareCalculateTest(arr, width, height, gamma);
+        //TODO REPLACE WITH DIRECT FUNCTION
     }
     struct timespec end;
     clock_gettime(CLOCK_MONOTONIC, &end);

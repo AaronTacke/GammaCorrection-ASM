@@ -6,9 +6,9 @@
 void calculate(uint8_t *arr, int width, int height, float gamma){
 	//Values for a, b and c are going to be stored seperately later. 
 	//(And will be adapted again after implementation)
-	int a = 5;
-	int b = 5;
-	int c = 5;
+	int a = 85;
+	int b = 85;
+	int c = 86;
 	//We have 3 values for every pixel, so the total number of values is:
 	int length = width*height*3;
 	for(int i = 0; i < length; i+=3){ //For every pixel:
