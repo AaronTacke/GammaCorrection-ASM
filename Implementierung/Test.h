@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 
 //Adds method test() to test the programm with a standard image
 //Adds method testIamge(char* path) to test the program with a chosen file.

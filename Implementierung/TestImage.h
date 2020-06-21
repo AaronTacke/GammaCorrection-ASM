@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 
 //Provides Array with pixels for testing.
 

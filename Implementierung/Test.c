@@ -2,6 +2,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 #include "compare.h"
 #include "ReadAndWritePPM.h"
 #include "TestImage.h"

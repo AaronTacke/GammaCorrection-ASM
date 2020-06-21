@@ -1,3 +1,4 @@
+#include <stdint.h>
 
 //Used to test if optimization ideas work
 

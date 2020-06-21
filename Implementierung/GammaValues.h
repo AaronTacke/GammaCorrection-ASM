@@ -1,3 +1,4 @@
+#include <stdint.h>
 
 //Provides Array with all possible gamma values
 
