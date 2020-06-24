@@ -1,6 +1,11 @@
 .intel_syntax noprefix
+.global _calculate_asm
 .global calculate_asm
 .text
+
+_calculate_asm:
+call calculate_asm
+ret
 
 calculate_asm:
 //Register Usage:
@@ -47,10 +52,20 @@ por xmm10, xmm15
 //Prepare Byte-Mask for Result PSHUFB
 //0x0e0e0e 0b0b0b 090909 050505 020202 ff
 pxor xmm7, xmm7
-mov rcx, 0x0e0e0e0b0b0b0909
+mov rcx, 0x0202020505050909
 movq xmm7, rcx
 PSLLDQ xmm7, 8
-mov rcx, 0x09050505020202ff
+mov rcx, 0x090b0b0b0e0e0eff
+movq xmm15, rcx
+por xmm7, xmm15
+
+//Prepare Byte-Mask for storing first 15 Bytes
+//Back to the memory (without 16th)
+pxor xmm6, xmm6
+mov rcx, 0xffffffffffffffff
+movq xmm6, rcx
+PSLLDQ xmm6, 8
+mov rcx, 0xffffffffffffff00
 movq xmm15, rcx
 por xmm7, xmm15
 
@@ -82,7 +97,8 @@ JB 1f //End of loop
 
 movdqu xmm1, [rdi]
 
-//ECX saves last byte
+//xmm0 saves last byte
+movdqa xmm0, xmm1
 movd ecx, xmm1
 and ecx, 0xf
 
@@ -113,7 +129,8 @@ PINSRB xmm1, ecx, 0x0
 //HERE WE WOULD NEED TO IMPLEMENT THE GAMMA FUNCTION
 //NOW ONLY CORRECT WITH g=1
 
-movdqu [rdi], xmm1
+VMASKMOVPS [rdi], xmm6, xmm1
+//movdqu [rdi], xmm1
 
 add rdi, 15
 jmp 1b
