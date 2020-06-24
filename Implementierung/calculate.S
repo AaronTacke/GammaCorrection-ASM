@@ -67,7 +67,7 @@ movq xmm6, rcx
 PSLLDQ xmm6, 8
 mov rcx, 0xffffffffffffffff
 movq xmm15, rcx
-por xmm7, xmm15
+por xmm6, xmm15
 
 //Prepare Byte-Mask for a-multiplicatoin (a=85=0x55)
 pxor xmm11, xmm11
@@ -114,22 +114,21 @@ PMULLD xmm2, xmm12
 PMULLD xmm3, xmm13
 
 //Store results in all bits
-PSHUFB xmm1, xmm7
-PSHUFB xmm2, xmm7
-PSHUFB xmm3, xmm7
+//PSHUFB xmm1, xmm7
+//PSHUFB xmm2, xmm7
+//PSHUFB xmm3, xmm7
 
 //Add registers up
-PADDB xmm1, xmm2
-PADDB xmm1, xmm3
+PADDD xmm1, xmm2
+PADDD xmm1, xmm3
 
-//Place last byte (stored in ecx) back
-PINSRB xmm1, ecx, 0x0
+//Move results to all Bytes in xmm Register
+PSHUFB xmm1, xmm7
 
-//HERE WE WOULD NEED TO IMPLEMENT THE GAMMA FUNCTION
-//NOW ONLY CORRECT WITH g=1
-
-
+//Place last byte (stored in xmm0) back
 POR xmm1, xmm0
+
+//Move result to memory
 movdqu [rdi], xmm1
 
 add rdi, 15
