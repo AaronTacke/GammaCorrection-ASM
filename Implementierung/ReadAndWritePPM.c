@@ -16,8 +16,7 @@ void wrongFormatAndExit(){
     exit(0);
 }
 
-//TODO
-//There can be errors, if there are not two values for the width and height
+
 uint8_t* readPicture(char* path){
     char buffer[NUMBEROFCHARSPERLINE];
     FILE *file = fopen(path, "r");
@@ -28,7 +27,6 @@ uint8_t* readPicture(char* path){
     }
     //First line
     if(fgets(buffer, NUMBEROFCHARSPERLINE, file) != NULL){
-        //TODO what if there is a space after the P3?
         const char format[] = "P3\n";
         //If the first line has the wrong format
         if(strcmp(format, buffer) != 0){
@@ -85,13 +83,12 @@ uint8_t* readPicture(char* path){
         wrongFormatAndExit();
     }
 
-    //creat pixel array
+    //creat pixel array //+15 is used as optimization so that the Assembler code doesnt have to check where to end.
     int counter = 0;
-    uint8_t* pixels = (uint8_t*) malloc(width * height * 3 * sizeof(uint8_t));
+    uint8_t* pixels = (uint8_t*) malloc(width * height * 3 * sizeof(uint8_t)+15);
 
     if(pixels==NULL){
-        //TODO Check if other circumstances (other than a big file) can lead to pixels==null
-        printf("The image is too big. Please choose another file.\n");
+        printf("Was not able to allocate the memory space needed for this image.\n");
         exit(0);
     }
 
@@ -128,7 +125,6 @@ void writePicture(char* path, uint8_t image[]){
         }
         fclose(file);
     } else{
-        //TODO is this error message correct?
         printf("Saving the image was not possible.\n The program needs access rights for file %s\n", path);
         exit(0);
     }
