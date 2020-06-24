@@ -6,7 +6,7 @@
 #include "compare.h"
 #include "ReadAndWritePPM.h"
 #include "TestImage.h"
-#include "AssemblerAlternative.h"
+//#include "AssemblerAlternative.h"
 
 extern uint8_t* calculate_asm(uint8_t* picture, int width, int height, float gamma);
 

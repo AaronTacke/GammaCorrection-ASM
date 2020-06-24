@@ -19,28 +19,28 @@ add rsi, rdi
 //Prepare Byte-Mask for a-PSHUFB
 //0xffff0fff ff0cff09 ffffff06 ffff03ff
 pxor xmm8, xmm8
-mov rcx, 0xffff0fffff0cff09
+mov rcx, 0xffff00ffff03ff06
 movq xmm8, rcx
 PSLLDQ xmm8, 8
-mov rcx, 0xffffff06ffff03ff
+mov rcx, 0xffffff09ffff0cff
 movq xmm15, rcx
 por xmm8, xmm15
 //Prepare Byte-Mask for b-PSHUFB
 //0xffff0eff ff0bff08 ffffff05 ffff02ff
 pxor xmm9, xmm9
-mov rcx, 0xffff0effff0bff08
+mov rcx, 0xffff01ffff04ff07
 movq xmm9, rcx
 PSLLDQ xmm9, 8
-mov rcx, 0xffffff05ffff02ff
+mov rcx, 0xffffff0affff0dff
 movq xmm15, rcx
 por xmm9, xmm15
 //Prepare Byte-Mask for c-PSHUFB
 //0xffff0dff ff0aff07 ffffff04 ffff01ff
 pxor xmm10, xmm10
-mov rcx, 0xffff0dffff0aff07
+mov rcx, 0xffff02ffff05ff08
 movq xmm10, rcx
 PSLLDQ xmm10, 8
-mov rcx, 0xffffff04ffff01ff
+mov rcx, 0xffffff0bffff0eff
 movq xmm15, rcx
 por xmm10, xmm15
 
@@ -80,7 +80,7 @@ por xmm13, xmm15
 cmp rsi, rdi
 JB 1f //End of loop
 
-movdqa xmm1, [rdi]
+movdqu xmm1, [rdi]
 
 //ECX saves last byte
 movd ecx, xmm1
@@ -113,7 +113,7 @@ PINSRB xmm1, ecx, 0x0
 //HERE WE WOULD NEED TO IMPLEMENT THE GAMMA FUNCTION
 //NOW ONLY CORRECT WITH g=1
 
-movdqa [rdi], xmm1
+movdqu [rdi], xmm1
 
 add rdi, 15
 jmp 1b

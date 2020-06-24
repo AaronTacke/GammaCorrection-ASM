@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include "Test.h"
 #include "ReadAndWritePPM.h"
-#include "AssemblerAlternative.h"
+//#include "AssemblerAlternative.h"
 
 typedef u_int8_t uint8_t;
 
