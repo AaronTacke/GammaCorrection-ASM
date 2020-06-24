@@ -24,48 +24,48 @@ add rsi, rdi
 //Prepare Byte-Mask for a-PSHUFB
 //0xffff0fff ff0cff09 ffffff06 ffff03ff
 pxor xmm8, xmm8
-mov rcx, 0xffff00ffff03ff06
+mov rcx, 0xffff0cffff09ff06
 movq xmm8, rcx
 PSLLDQ xmm8, 8
-mov rcx, 0xffffff09ffff0cff
+mov rcx, 0xffffff03ffff00ff
 movq xmm15, rcx
 por xmm8, xmm15
 //Prepare Byte-Mask for b-PSHUFB
 //0xffff0eff ff0bff08 ffffff05 ffff02ff
 pxor xmm9, xmm9
-mov rcx, 0xffff01ffff04ff07
+mov rcx, 0xffff0dffff0aff07
 movq xmm9, rcx
 PSLLDQ xmm9, 8
-mov rcx, 0xffffff0affff0dff
+mov rcx, 0xffffff04ffff01ff
 movq xmm15, rcx
 por xmm9, xmm15
 //Prepare Byte-Mask for c-PSHUFB
 //0xffff0dff ff0aff07 ffffff04 ffff01ff
 pxor xmm10, xmm10
-mov rcx, 0xffff02ffff05ff08
+mov rcx, 0xffff0effff0bff08
 movq xmm10, rcx
 PSLLDQ xmm10, 8
-mov rcx, 0xffffff0bffff0eff
+mov rcx, 0xffffff05ffff02ff
 movq xmm15, rcx
 por xmm10, xmm15
 
 //Prepare Byte-Mask for Result PSHUFB
 //0x0e0e0e 0b0b0b 090909 050505 020202 ff
 pxor xmm7, xmm7
-mov rcx, 0x0202020505050909
+mov rcx, 0x0e0e0e0b0b0b0909
 movq xmm7, rcx
 PSLLDQ xmm7, 8
-mov rcx, 0x090b0b0b0e0e0eff
+mov rcx, 0x09050505020202ff
 movq xmm15, rcx
 por xmm7, xmm15
 
 //Prepare Byte-Mask for storing first 15 Bytes
 //Back to the memory (without 16th)
 pxor xmm6, xmm6
-mov rcx, 0xffffffffffffffff
+mov rcx, 0x00ffffffffffffff
 movq xmm6, rcx
 PSLLDQ xmm6, 8
-mov rcx, 0xffffffffffffff00
+mov rcx, 0xffffffffffffffff
 movq xmm15, rcx
 por xmm7, xmm15
 
@@ -130,6 +130,9 @@ PINSRB xmm1, ecx, 0x0
 //NOW ONLY CORRECT WITH g=1
 
 VMASKMOVPS [rdi], xmm6, xmm1
+
+//TODO for testing/debugging:
+movdqu xmm1, [rdi]
 //movdqu [rdi], xmm1
 
 add rdi, 15
