@@ -52,17 +52,17 @@ por xmm10, xmm15
 //Prepare Byte-Mask for Result PSHUFB
 //0x0e0e0e 0b0b0b 090909 050505 020202 ff
 pxor xmm7, xmm7
-mov rcx, 0x0e0e0e0b0b0b0909
+mov rcx, 0xff0e0e0e0b0b0b09
 movq xmm7, rcx
 PSLLDQ xmm7, 8
-mov rcx, 0x09050505020202ff
+mov rcx, 0x0909050505020202
 movq xmm15, rcx
 por xmm7, xmm15
 
-//Prepare Byte-Mask for storing first 15 Bytes
-//Back to the memory (without 16th)
+//Prepare Byte-Mask for saving the last byte
+//efficiently
 pxor xmm6, xmm6
-mov rcx, 0x00ffffffffffffff
+mov rcx, 0x0fffffffffffffff
 movq xmm6, rcx
 PSLLDQ xmm6, 8
 mov rcx, 0xffffffffffffffff
@@ -99,8 +99,7 @@ movdqu xmm1, [rdi]
 
 //xmm0 saves last byte
 movdqa xmm0, xmm1
-movd ecx, xmm1
-and ecx, 0xf
+PSHUFB xmm0, xmm6
 
 //MOV R values in xmm1, G values in xmm2, B values in xmm3
 movdqa xmm2, xmm1
@@ -129,11 +128,9 @@ PINSRB xmm1, ecx, 0x0
 //HERE WE WOULD NEED TO IMPLEMENT THE GAMMA FUNCTION
 //NOW ONLY CORRECT WITH g=1
 
-VMASKMOVPS [rdi], xmm6, xmm1
 
-//TODO for testing/debugging:
-movdqu xmm1, [rdi]
-//movdqu [rdi], xmm1
+POR xmm1, xmm0
+movdqu [rdi], xmm1
 
 add rdi, 15
 jmp 1b
