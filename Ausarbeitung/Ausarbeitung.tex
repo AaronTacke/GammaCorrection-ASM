@@ -4,10 +4,10 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% TODO: Ersetzen Sie in den folgenden Zeilen die entsprechenden -Texte-
 %% mit den richtigen Werten.
-\newcommand{\theGroup}{IhreGruppennummer} % Beispiel: 42
-\newcommand{\theNumber}{IhreProjektnummer} % Beispiel: A123
-\author{Vorname1 Nachname1 \and Vorname2 Nachname2 \and Vorname3 Nachname3}
-\date{AktuellesSemester} % Beispiel: Wintersemester 2019/20
+\newcommand{\theGroup}{141} % Beispiel: 42
+\newcommand{\theNumber}{A208} % Beispiel: A123
+\author{Philip Haitzer \and Thomas Sedlmeyr \and Aaron Tacke}
+\date{Sommersemester 2020} % Beispiel: Wintersemester 2019/20
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Diese Zeile bitte -nicht- aendern.
@@ -17,16 +17,29 @@
 \maketitle
 
 \section{Einleitung}
+\subsection{Einsatz und Funktionsweise der Gammakorrektur}
 
 
 \section{Lösungsansatz}
+\subsection{Untersuchung der Gammafunktion}
+Unsere Ziel ist es für alle positiven Gammawerte, die mit dem Datentype float dargestellt werden können, die Gammakorrektur durchzuführen. Hierfür untersuchten wir die Gammafunktion hinsichtlich ihres Wertebereichs und Monotonieverhaltens.
+\begin{equation}
+p_{neu} = \frac{p_{alt}}{255}^{\gamma}
+\end{equation}   
+Da $p_{alt} \in \lbrack255\rbrack$, $p_{neu} \in \lbrack255\rbrack$ und sich aber mit dem Datentype float $2^{31}$ unterschiedliche positive Zahlen darstellen lassen, muss die Gammafunktion für mehrere unterschiedliche $\gamma$ gleiche Funktionswerte liefern. Zudem handelt es sich bei der Gammafunktion um eine Exponentialfunktion mit diskretem Wertebereich und sie ist daher monoton steigend. 
+\subsection{Berechnung aller Gammafunktionen}
+Die zwei Erkenntnisse über die endliche Anzahl an unterschiedlichen Gammafunktionen und über die Monotonie nutzen wir, um mit Hilfe eines C Programms Intervalle zu berechnen in denen die Gammafunktion die gleichen Werte liefert. Hierfür nutzten wir Bisektion, indem mit zwei aufeinanderfolgenden float Werten gestartet und die Größe des Intervalls zunächst so lange verdoppelt wird, bis sich die Funktionswerte an den Intervallgrenzen unterscheiden. Von diesem neuen Intervall wird die Mitte und der Funktionswert an der mittleren Stelle berechnet. Ist dieser neue Wert gleich dem Funktionswert der rechten Intervallgrenze, wird der das linke Intervall weiter verkleinert, wenn nicht wird das rechte verkleinert. Dies wird solange fortgeführt bis die Stelle gefunden wurde, an der sich für zwei aufeinanderfolgende float Werte die Funktionswerte unterscheiden.      
+\subsection{Vergleichsimplementierung}
+\subsection{Berechnung der Wurzel}
+Ein weiterer Methode um $\sqrt[n]{z}$ zu berechnen ist diese als Nullstelle des Polynoms $f(x)=x^n-z$ auszudrücken und diese mit verschiedenen Verfahren zur Nullstellenapproximation wie zum Beispiel der Newtonverfahren anzunähern. Weil man für diese Verfahren mehrmals verschiedene Funktionswerte von $f(x)$ berechnen muss    
 
 
 % TODO: Je nach Aufgabenstellung einen der Begriffe wählen
 \section{Korrektheit/Genauigkeit}
 
 
-\section{Performanzanalyse}
+\section{Performanceanalyse}
+\subsection{Assembler vs. Vergleichsimplementierung}
 
 
 \section{Zusammenfassung und Ausblick}
@@ -38,3 +51,4 @@
 \bibliography{Ausarbeitung}{}
 
 \end{document}
+
