@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
-#include<string.h>
+#include <string.h>
 #include <stdlib.h>
 
 #define NUMBEROFCHARSPERLINE 100
