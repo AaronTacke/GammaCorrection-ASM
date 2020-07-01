@@ -3,11 +3,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
-#include "Test.h"
-#include "ReadAndWritePPM.h"
+#include "headers/Test.h"
+#include "headers/ReadAndWritePPM.h"
 //#include "AssemblerAlternative.h"
 
-typedef u_int8_t uint8_t;
 
 extern uint8_t* calculate_asm(uint8_t* picture, int width, int height, float gamma);
 
@@ -118,8 +117,8 @@ int main(int argc, char *argv[]){
             printUsageAndExit(name);
         }
         //Check if gamma is valid
-        if (gamma < 0){
-            printf("Please enter a gamma value (-g) that is >= 0\n");
+        if (gamma <= 0){
+            printf("Please enter a gamma value (-g) that is > 0\n");
             exit(EXIT_FAILURE);
         }
 
