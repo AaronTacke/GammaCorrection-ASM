@@ -22,12 +22,13 @@ void replaceWithAssembler(uint8_t* picture, int width, int height, float gamma){
 void printUsageAndExit(char *name){
     //TODO Add more information
     printf("Usage: %s [-i inputPath] [-g gamma] [-o outputPath] [-t] [-b] [-h]\n", name);
+
     exit(EXIT_FAILURE);
 }
 
 void checkForValidArgument(char *programName, char operationName) {
     if (optarg[0] == 45){
-        printf("Missing argument for option: -%c\n", operationName);
+        printf("Wrong argument for option: -%c\n", operationName);
         printUsageAndExit(programName);
     }
 }
@@ -38,6 +39,7 @@ int main(int argc, char *argv[]){
     char *outputPath = "";
     int testFlag = 0;
     int benchmarkFlag = 0;
+    int benchmarkIterations = 100;
     //set gamma to 1 as default value
     float gamma = -1;
     char opt;
@@ -45,7 +47,7 @@ int main(int argc, char *argv[]){
     if (argc < 2){
         printUsageAndExit(name);
     }
-    while ((opt = getopt(argc, argv, "i:g:to:bh")) != -1) {
+    while ((opt = getopt(argc, argv, ":i:g:to:b:h")) != -1) {
         switch (opt) {
             case 'i':
                 checkForValidArgument(name, opt);
@@ -64,10 +66,19 @@ int main(int argc, char *argv[]){
                 break;
             case 'b':
                 benchmarkFlag = 1;
-                //TODO could -b have an OPTIONAL parameter with numbers of iterations?
+                if (optarg != NULL){
+                    checkForValidArgument(name, opt);
+                    benchmarkIterations = atoi(optarg);
+                }
                 break;
             case 'h':
                 printUsageAndExit(name);
+                break;
+            case ':':
+                if (optopt != 'b'){
+                    printUsageAndExit(name);
+                }
+                benchmarkFlag = 1;
                 break;
             default:
                 printUsageAndExit(name);
@@ -81,7 +92,6 @@ int main(int argc, char *argv[]){
 
     if(benchmarkFlag==1){
 
-        //TODO Optional parameter for iterations
         //Benchmarking:
         if(outputPath[0] != '\0'){
             printf("You can not use an output path while benchmarking.\n");
@@ -97,8 +107,8 @@ int main(int argc, char *argv[]){
         }
         //test with standard image
 
-        double time = calculateTime(arr, width, height, gamma, 100);
-        double compareTime = calculateCompareTime(arr, width, height, gamma, 100);
+        double time = calculateTime(arr, width, height, gamma, benchmarkIterations);
+        double compareTime = calculateCompareTime(arr, width, height, gamma, benchmarkIterations);
         printf("Optimized: %f\nNormal: %f\n",time, compareTime);
         exit(EXIT_SUCCESS);
     }
@@ -118,7 +128,7 @@ int main(int argc, char *argv[]){
             printUsageAndExit(name);
         }
         //Check if gamma is valid
-        if (gamma < 0){
+        if (gamma <= 0){
             printf("Please enter a gamma value (-g) that is >= 0\n");
             exit(EXIT_FAILURE);
         }
