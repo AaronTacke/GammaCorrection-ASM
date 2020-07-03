@@ -3,11 +3,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
-#include "Test.h"
-#include "ReadAndWritePPM.h"
+#include "headers/Test.h"
+#include "headers/ReadAndWritePPM.h"
 //#include "AssemblerAlternative.h"
 
-typedef u_int8_t uint8_t;
 
 extern uint8_t* calculate_asm(uint8_t* picture, int width, int height, float gamma);
 
@@ -21,7 +20,7 @@ void replaceWithAssembler(uint8_t* picture, int width, int height, float gamma){
 
 void printUsageAndExit(char *name){
     //TODO Add more information
-    printf("Usage: %s [-i inputPath] [-g gamma] [-o outputPath] [-t] [-b] [-h]\n", name);
+    printf("Usage: %s [-i inputPath] [-g gamma] [-o outputPath] [-b iterations] [-t] [-h]\n", name);
 
     exit(EXIT_FAILURE);
 }
@@ -130,6 +129,7 @@ int main(int argc, char *argv[]){
         //Check if gamma is valid
         if (gamma <= 0){
             printf("Please enter a gamma value (-g) that is >= 0\n");
+            printf("Please enter a gamma value (-g) that is > 0\n");
             exit(EXIT_FAILURE);
         }
 

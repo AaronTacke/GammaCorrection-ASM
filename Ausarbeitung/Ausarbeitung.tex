@@ -4,10 +4,10 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% TODO: Ersetzen Sie in den folgenden Zeilen die entsprechenden -Texte-
 %% mit den richtigen Werten.
-\newcommand{\theGroup}{IhreGruppennummer} % Beispiel: 42
-\newcommand{\theNumber}{IhreProjektnummer} % Beispiel: A123
-\author{Vorname1 Nachname1 \and Vorname2 Nachname2 \and Vorname3 Nachname3}
-\date{AktuellesSemester} % Beispiel: Wintersemester 2019/20
+\newcommand{\theGroup}{141} % Beispiel: 42
+\newcommand{\theNumber}{A208} % Beispiel: A123
+\author{Philip Haitzer \and Thomas Sedlmeyr \and Aaron Tacke}
+\date{Sommersemester 2020} % Beispiel: Wintersemester 2019/20
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Diese Zeile bitte -nicht- aendern.
@@ -17,16 +17,80 @@
 \maketitle
 
 \section{Einleitung}
+\subsection{Einsatz und Funktionsweise der Gammakorrektur}
+Selbst über 100 Jahre nach der Entwicklung der Farbphotographie, erfreuen sich Schwarzweißbilder, selbst in der heutigen Zeit, hoher Beliebtheit. Denn auf diesen finden sich keine störenden Farben, die vom eigentlichen Motiv ablenken könnten. Vielmehr lenken sie gezielt den Blick des Betrachters auf das wesentliche und heben exzellent den Kontrast und die graphische Strukturen der aufgenommenen Szenerie hervor. 
+\\
+\newline
+Möchte man aber in der heutigen Zeit digitale Schwarzweißaufnahmen machen gelingt dies in den meisten Fällen nur durch Umwandlung eines digitalen Farbbildes.   
 
 
 \section{Lösungsansatz}
+\subsection{Berechnung des Graustufenfilters}
+Zu Beginn wird jedes Pixel in Graustufen umgewandelt. Dabei berechnet sich der neue Wert eines Pixels mit folgender Formel.
+\begin{equation}
+p_{alt} =  \begin{pmatrix}R \\\ G \\\ B \end{pmatrix}
+\end{equation}
 
+\begin{equation}
+D = \frac{a \cdot R  + b \cdot G  + c \cdot B }{a + b + c}
+\end{equation}   
+
+\begin{equation}
+p_{neu} =  \begin{pmatrix}D \\\ D \\\ D \end{pmatrix}
+\end{equation}	
+\\
+Wir entschieden uns, dass für die Gewichtung $a + b + c = 256$ gelten soll. Dies birgt den Vorteil, dass für das Speichern der Zwischenergebnisse der einzelnen Multiplikation jeweils nur nur ein Byte benötigt wird, da nur der Rest zu $256$ für die weitere Berechnung von Nutzen ist und so durch die Nutzung von SIMD, in einem XMM-Register, fünf Pixel auf einmal berechnet werden können.    
+
+\subsection{Untersuchung der Gammafunktion}
+Unsere Ziel ist es für alle positiven Gammawerte, die mit dem Datentype float dargestellt werden können, die Gammakorrektur durchzuführen. Da es sich bei $\gamma$, um eine Gleitkommazahl handelt, ist für die Berechnung der Gammafunktion ein effizientes Berechnen und Potenzieren von Wurzeln erforderlich. Vor allem das Berechnen der nten Wurzel stellte sich hierbei als Problem heraus, weil hierfür eine Vielzahl an mathematischen Operationen ausgeführt werden müssen. Aus diesem Grund untersuchten wir die Gammafunktion hinsichtlich ihres Wertebereichs und Monotonieverhaltens, um ein effizienteres Verfahren zu entwickeln.
+\begin{equation}
+p_{neu} = \left(\frac{p_{alt}}{255}\right)^{\gamma}
+\end{equation}   
+Da $p_{alt} \in \lbrack255\rbrack$, $p_{neu} \in \lbrack255\rbrack$ und sich aber mit dem Datentype float $2^{31}$ unterschiedliche positive Zahlen darstellen lassen, muss die Gammafunktion für mehrere unterschiedliche $\gamma$ gleiche Funktionswerte liefern. Zudem handelt es sich bei der Gammafunktion um eine Exponentialfunktion mit diskretem Wertebereich und sie ist daher monoton steigend. 
+\subsection{Berechnung aller Gammafunktionen}
+Die zwei Erkenntnisse über die endliche Anzahl an unterschiedlichen Gammafunktionen und über die Monotonie nutzen wir, um mit Hilfe eines C Programms Intervalle für $\gamma$ zu berechnen in denen die Gammafunktionen gleiche Werte liefern. Hierfür verwendeten wir Bisektion, indem mit zwei aufeinanderfolgenden float Werten gestartet und die Größe des Intervalls zunächst so lange verdoppelt wird, bis sich die Funktionswerte an den Intervallgrenzen unterscheiden. Von diesem neuen Intervall wird die Mitte und der Funktionswert an der mittleren Stelle berechnet. Ist dieser neue Wert gleich dem Funktionswert der rechten Intervallgrenze, wird das linke Intervall weiter verkleinert, wenn nicht wird das rechte verkleinert. Dies wird solange fortgeführt bis die Stelle gefunden wurde, an der sich für zwei aufeinanderfolgende float Werte die Funktionswerte unterscheiden. Nach Ausführung des Programms speicherten wir die 64484 in einer Headerdatei ab, um bei späteren Tests über einen schnellen Zugriff zu verfügen.         
+
+\subsection{Berechnung der Wurzel}
+Ein weiterer Methode um $\sqrt[n]{z}$ zu berechnen, ist diese als Nullstelle des Polynoms $f(x)=x^n-z$ auszudrücken und diese mit verschiedenen Verfahren zur Nullstellenapproximation wie zum Beispiel der Newtonverfahren anzunähern. Weil man aber selbst für das schnell konvergierend Newtonverfahren mehrmals verschiedene Funktionswerte von $f(x)$ berechnen muss, stellte sich dieses Verfahren als nicht effizient genug heraus.     
+
+\subsection{Binäre Suche zur Berechnung der Gammafunktion}
+Um die Gammafunktion zu berechnen, wandelten wir  $\gamma$ in einen Bruch bestehend aus zwei Integer um. Ziel dieses Verfahrens war es wieder mit Hilfe von Binärer Suche den richtigen Wert der Gammafunktion zu bestimmen, indem ...Aaron
+\\
+\newline
+\noindent	
+Zur Berechnung der ganzzahligen Potenzen implementierten wir zudem eine Methode, die es ermöglicht mit Hilfe von Binärer Exponentiation die Anzahl, der für die Exponentialfunktion erforderlichen Multiplikationen, auf ein Minimum zu reduzieren. 
+\\
+\newline
+\noindent		 
+Für einen Großteil der Werte von $\gamma$ erwies sich diese Verfahren als effizient. Aber die Genauigkeit des Bruchs für die Darstellung von $\gamma$ wies kleine Fehler auf, die sich durch das Potenzieren aufsummierten, sodass es bei manchen $\gamma$ Werten zu Fehlern bei der Berechnung kam.       
+
+\subsection{Berechnung auf den Exponenten}
+Um die Umwandlung von Dezimalzahlen in Brüche zu umgehen formten wir mit Hilfe der Logarithmusgesetze die Gammafunktion um. ...Aaron
+\begin{align}	
+p_{neu} = \left(\frac{p_{alt}}{255}\right)^{\gamma} \cdot 255
+\end{align}
+\begin{align}	
+\ln (p_{neu}) = \gamma \cdot \ln\left(\frac{p_{alt}}{255}\right) \cdot \ln(255)
+\end{align}
+\begin{align}
+p_{neu} \cdot 255^\gamma = {p_{alt}}^{\gamma}
+\end{align}
+\begin{align}
+\gamma \cdot \ln ( p_{neu} \cdot 255) = \gamma \cdot \ln({p_{alt}})
+\end{align}
+
+\subsection{Vergleichsimplementierung}
 
 % TODO: Je nach Aufgabenstellung einen der Begriffe wählen
 \section{Korrektheit/Genauigkeit}
-
-
-\section{Performanzanalyse}
+\subsection{Berechnung aller möglichen Gammafunktionen}
+Uns war es wichtig für jedes $\gamma$, das mit einem float dargestellt werden kann, den korrekten Wert zu berechnen und so die Berechnung nicht unnötig einzuschränken. Da wir alle möglichen Gammafunktionen kennen, können wir für unser Programm garantieren, dass jeder $\gamma$ Wert korrekt berechnet wird. 
+\\
+Auch verglichen wir alle Resultate der Assemblerimplementierungen mit äquivalenten C-Implementierungen, um sicherzugehen, dass die Optimierungen keine Fehler hervorriefen.  
+\subsection{Robustheit des Programms}
+Unser Programm prüft zudem, ob die übergebene ppm-Datei fehlerhaft ist und fängt falsche Parameter des Benutzers wie zum Beispiel negative $\gamma$ Werte oder nicht unterstütze Operationen ab. 
+\section{Performanceanalyse}
+\subsection{Assembler vs. Vergleichsimplementierung}
 
 
 \section{Zusammenfassung und Ausblick}
@@ -36,5 +100,6 @@
 % Beispiel: CR2 ist ein Register der x86-Architektur~\cite{intel2017man}.
 \bibliographystyle{plain}
 \bibliography{Ausarbeitung}{}
-
+	
 \end{document}
+
