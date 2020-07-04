@@ -80,8 +80,9 @@ void testAssemblerCalculateWholeFunction(){
         uint8_t* resASM = calculateWholeFunction(gammaValue, logArray, gammaArray, resultArray);
         for (int j = 0; j < 255; ++j) {
             if (resC[j] != resASM[j]){
-                printf("error with g=%e expected %d, got %d\n", gammaValue, resC[j], resASM[j]);
-            }
+                printf("error with j=%d, g=%e expected %d, got %d\n",j, gammaValue, resC[j], resASM[j]);
+                printf("dif: %d",resASM[j]-resC[j]);
+            }else printf("\n Correct \n");
         }
     }
 }
@@ -101,8 +102,8 @@ void testAssemblerCalculateFunctionBinarySearch(){
 
 
 int main(){
-    testAssemblerCalculateFunctionBinarySearch();
-    //testAssemblerCalculateWholeFunction();
+    //testAssemblerCalculateFunctionBinarySearch();
+    testAssemblerCalculateWholeFunction();
     printf("Test done.");
 }
 
