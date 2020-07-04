@@ -6,7 +6,6 @@
 #include "headers/compare.h"
 #include "headers/ReadAndWritePPM.h"
 #include "headers/TestImage.h"
-//#include "AssemblerAlternative.h"
 
 extern uint8_t* calculate_asm(uint8_t* picture, int width, int height, float gamma);
 
@@ -43,7 +42,9 @@ uint8_t *getTestArray() {
     height = 16;
     //Place in the memory is allocated to save the image
     uint8_t *memory = (uint8_t *) malloc(width * height * 3 * sizeof(uint8_t));
-    //TODO check if malloc is NULL
+    if(memory==0){
+        printf("The test was not executed because the program is not able to make use of sufficient memory.\nPlease choose a smaller image.");
+    }
     //The Image is stored in the memory number by number.
     for (int i = 0; i < (width * height * 3); i++) {
         *(memory + i) = testImageArray[i];
@@ -56,7 +57,9 @@ uint8_t *getTestArray() {
 uint8_t *copyTestArray(uint8_t *arr) {
     //Place in the memory is allocated to save the image
     uint8_t *memory = (uint8_t *) malloc(width * height * 3 * sizeof(uint8_t));
-    //TODO check if malloc is NULL
+    if(memory==0){
+        printf("The test was not executed because the program is not able to make use of sufficient memory.\nPlease choose a smaller image.");
+    }
     //The Image is stored in the memory number by number.
     for (int i = 0; i < (width * height * 3); i++) {
         *(memory + i) = *(arr + i);
@@ -207,9 +210,3 @@ double calculateCompareTime(uint8_t *arr, int width, int height, float gamma, in
     double averageTime = duration / iterations;
     return averageTime;
 }
-
-//int main(int argc, char** argv){
-//    test();
-//    testImage("andererTest.ppm");
-//    return 0;
-//}

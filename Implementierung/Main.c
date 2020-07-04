@@ -3,9 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
-#include "headers/Test.h"
+#include "headers/TestAndBenchmarking.h"
 #include "headers/ReadAndWritePPM.h"
-//#include "AssemblerAlternative.h"
 
 
 extern uint8_t* calculate_asm(uint8_t* picture, int width, int height, float gamma);
