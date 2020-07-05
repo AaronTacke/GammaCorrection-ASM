@@ -31,7 +31,7 @@ int main(int argc, char *argv[]){
     char *outputPath = "";
     int testFlag = 0;
     int benchmarkFlag = 0;
-    int benchmarkIterations = 100;
+    int benchmarkIterations = 20;
     //set gamma to 1 as default value
     float gamma = -1;
     char opt;
@@ -92,7 +92,7 @@ int main(int argc, char *argv[]){
 
         //Print diagram if no gamma is set.
         if (gamma <= 0){
-            showDiagramData(0,100);
+            showDiagramData(0,benchmarkIterations);
             exit(EXIT_SUCCESS);
         }
 
