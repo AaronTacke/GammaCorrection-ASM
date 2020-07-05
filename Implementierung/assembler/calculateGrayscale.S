@@ -69,23 +69,23 @@ mov rcx, 0xffffffffffffffff
 movq xmm15, rcx
 por xmm6, xmm15
 
-//Prepare Byte-Mask for a-multiplicatoin (a=85=0x55)
+//Prepare Byte-Mask for a-multiplicatoin (a=77=0x4D)
 pxor xmm11, xmm11
-mov rcx, 0x5500000055
+mov rcx, 0x4D0000004D
 movq xmm11, rcx
 PSLLDQ xmm11, 8
 movq xmm15, rcx
 por xmm11, xmm15
-//Prepare Byte-Mask for b-multiplicatoin (b=85=0x55)
+//Prepare Byte-Mask for b-multiplicatoin (b=151=0x97)
 pxor xmm12, xmm12
-mov rcx, 0x5500000055 //Doubled because we may change b value
+mov rcx, 0x9700000097 //Doubled because we may change b value
 movq xmm12, rcx
 PSLLDQ xmm12, 8
 movq xmm15, rcx
 por xmm12, xmm15
-//Prepare Byte-Mask for c-multiplicatoin (a=86=0x56)
+//Prepare Byte-Mask for c-multiplicatoin (a=28=0x1C)
 pxor xmm13, xmm13
-mov rcx, 0x5600000056
+mov rcx, 0x1C0000001C
 movq xmm13, rcx
 PSLLDQ xmm13, 8
 movq xmm15, rcx
