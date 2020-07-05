@@ -74,17 +74,17 @@ void testAssemblerCalculateWholeFunction(){
     }
     *(logArray+254) = 1.79769e+308;
     int startValue = 1;
-    for (int i = startValue; i < sizeof(gammaValues) / sizeof(float); ++i) {
-        float gammaValue = gammaValues[i];
+    //for (int i = startValue; i < sizeof(gammaValues) / sizeof(float); ++i) {
+        //float gammaValue = gammaValues[i];
+        float gammaValue = 1;
         uint8_t* resC = calculateResultArrayFast(gammaValue);
         uint8_t* resASM = calculateWholeFunction(gammaValue, logArray, gammaArray, resultArray);
-        for (int j = 0; j < 255; ++j) {
+        for (int j = 0; j <= 255; ++j) {
             if (resC[j] != resASM[j]){
                 printf("error with j=%d, g=%e expected %d, got %d\n",j, gammaValue, resC[j], resASM[j]);
-                printf("dif: %d",resASM[j]-resC[j]);
-            }else printf("\n Correct \n");
+            }
         }
-    }
+    //}
 }
 void testAssemblerCalculateFunctionBinarySearch(){
    int startValue = 1;
