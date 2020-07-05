@@ -17,6 +17,7 @@ calculate_asm:
 //rsi: width
 //rdx: height
 //xmm0: gamma
+CVTPS2PD xmm0, xmm0
 //rax: return value (pointer to result array)
 mov rax, rdi
 //new array-Pointer: r8
@@ -32,10 +33,10 @@ lea rsi, [rip + logValues]
 
 //ByteMask to Shift result bytes all over xmm register:
 pxor xmm14, xmm14
-mov rcx, 0x0f0e0e0e0d0d0d0c
+mov rcx, 0x0001010102020203
 movq xmm14, rcx
 PSLLDQ xmm14, 8
-mov rcx, 0x0c0c0b0b0b0a0a0a
+mov rcx, 0x0303040404050505
 movq xmm15, rcx
 por xmm14, xmm15
 
@@ -112,7 +113,7 @@ label:
 movsd xmm1, [rsi + rdi * 8]
 mulsd xmm1, xmm0
 xor rax, rax
-mov r9, 256
+mov r9, 255
 while:
 cmp rax, r9
 jge endWhile
