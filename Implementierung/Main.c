@@ -10,12 +10,6 @@
 extern uint8_t* calculate_asm(uint8_t* picture, int width, int height, float gamma);
 
 
-//Later replaced with Assembler file:
-void replaceWithAssembler(uint8_t* picture, int width, int height, float gamma){
-    //calculateOptimized(picture,width,height,gamma);
-    calculate_asm(picture,width,height,gamma);
-}
-
 
 void printUsageAndExit(char *name){
     //TODO Add more information
@@ -133,7 +127,7 @@ int main(int argc, char *argv[]){
         }
 
         uint8_t* picture = readPicture(inputPath);
-        replaceWithAssembler(picture, width, height, gamma);
+        calculate_asm(picture, width, height, gamma);
         if(writePicture(outputPath, picture)!=0){
             printf("Error while saving image.\n");
             exit(EXIT_FAILURE);

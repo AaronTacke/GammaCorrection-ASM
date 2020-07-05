@@ -9,29 +9,9 @@
 
 extern uint8_t* calculate_asm(uint8_t* picture, int width, int height, float gamma);
 
-//Calls method to be tested
-void calculateTest(uint8_t *arr, int width, int height, float gamma) {
-    calculate_asm(arr, width, height, gamma);
-}
-
-//Calls correct method to compare our results to
-void compareCalculateTest(uint8_t *arr, int width, int height, float gamma) {
-    calculate(arr, width, height, gamma);
-}
-
-//Calls method that opens a PPM Image
-uint8_t *readPictureTest(char *path) {
-    return readPicture(path);
-}
-
-//Calls method that saves a PPM Image
-int writePictureTest(char *path, uint8_t image[]) {
-    return writePicture(path, image);
-}
-
 void writeFileIfPathNotEmpty(char* path, uint8_t* arr){
     if(path[0]!='\0'){
-        writePictureTest(path, arr);
+        writePicture(path, arr);
     }
 }
 
@@ -99,8 +79,8 @@ int testGamma(float gamma, char* outputPath) {
     uint8_t *original = getTestArray();
     uint8_t *result = getTestArray();
     uint8_t *compare = getTestArray();
-    calculateTest(result, width, height, gamma);
-    compareCalculateTest(compare, width, height, gamma);
+    calculate_asm(result, width, height, gamma);
+    calculate(compare, width, height, gamma);
     //Saving the picture to look at it with gamma=1
     writeFileIfPathNotEmpty(outputPath, result);
     //Print information about the test:
@@ -113,8 +93,8 @@ int testImageGamma(uint8_t *original, float gamma, char* outputPath) {
     //The Arrays that will be compared:
     uint8_t *result = copyTestArray(original);
     uint8_t *compare = copyTestArray(original);
-    calculateTest(result, width, height, gamma);
-    compareCalculateTest(compare, width, height, gamma);
+    calculate_asm(result, width, height, gamma);
+    calculate(compare, width, height, gamma);
     //Saving the picture to look at it with gamma=1
     writeFileIfPathNotEmpty(outputPath, result);
     //Print information about the test:
@@ -124,7 +104,7 @@ int testImageGamma(uint8_t *original, float gamma, char* outputPath) {
 
 //Test the standard image with different gamma values
 int test(float gamma, char* outputPath) {
-    writePictureTest("./TestOriginal.ppm", getTestArray());
+    writePicture("./TestOriginal.ppm", getTestArray());
     if (gamma >= 0) {
         //Just test with given gamma value
         if (testGamma(gamma, outputPath) != 0) {
@@ -155,7 +135,7 @@ int test(float gamma, char* outputPath) {
 //Tests a given image with different gamma values
 int testImage(char *path, float gamma, char* outputPath) {
     //load the image
-    uint8_t *original = readPictureTest(path);
+    uint8_t *original = readPicture(path);
     if (gamma >= 0) {
         //Just test with given gamma value
         if (testImageGamma(original, gamma, outputPath) != 0) {
@@ -187,8 +167,7 @@ double calculateTime(uint8_t *arr, int width, int height, float gamma, int itera
     struct timespec start;
     clock_gettime(CLOCK_MONOTONIC, &start);
     for(int i = 0; i < iterations; i++){
-        calculateTest(arr, width, height, gamma);
-        //TODO REPLACE WITH DIRECT FUNCTION
+        calculate_asm(arr, width, height, gamma);
     }
     struct timespec end;
     clock_gettime(CLOCK_MONOTONIC, &end);
@@ -201,8 +180,7 @@ double calculateCompareTime(uint8_t *arr, int width, int height, float gamma, in
     struct timespec start;
     clock_gettime(CLOCK_MONOTONIC, &start);
     for(int i = 0; i < iterations; i++){
-        compareCalculateTest(arr, width, height, gamma);
-        //TODO REPLACE WITH DIRECT FUNCTION
+        calculate(arr, width, height, gamma);
     }
     struct timespec end;
     clock_gettime(CLOCK_MONOTONIC, &end);

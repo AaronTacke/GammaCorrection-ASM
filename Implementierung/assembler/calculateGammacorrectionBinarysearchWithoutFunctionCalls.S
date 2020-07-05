@@ -47,34 +47,255 @@ JB 1f //End of loop
 
 movdqu xmm3, [r8]
 
+
 //PIXEL 1:
 movd edi, xmm3
-call calculateFunctionBinarySearch
+#call calculateFunctionBinarySearch
+######################################################## Copied function to save the time to call:
+//rdi input
+//rsi logValuesPointer
+//set rax to null
+and rdi, 0x00000000000000ff
+cmp rdi, 0
+jne label1
+xor rax, rax
+ret
+label1:
+//min rax
+//max r9
+//middle r10
+//xmm1 logResult
+//xmm2 logSearch
+//calculate logResult
+movsd xmm1, [rsi + rdi * 8]
+mulsd xmm1, xmm0
+xor rax, rax
+mov r9, 256
+while1:
+cmp rax, r9
+jge endWhile1
+//calculate middle
+mov r10, rax
+add r10, r9
+sar r10, 1
+inc r10
+//calculate logSearch
+movsd xmm2, [rsi + r10 * 8]
+comisd xmm2, xmm1
+ja changeMax1
+//Change min:
+mov rax, r10
+jmp while1
+changeMax1:
+mov r9, r10
+dec r9
+jmp while1
+endWhile1:
+########################################################
 mov r13, rax
+
+
+
 //PIXEL 2:
 PSRLDQ xmm3, 3
 movd edi, xmm3
-call calculateFunctionBinarySearch
+#call calculateFunctionBinarySearch
+######################################################## Copied function to save the time to call:
+//rdi input
+//rsi logValuesPointer
+//set rax to null
+and rdi, 0x00000000000000ff
+cmp rdi, 0
+jne label2
+xor rax, rax
+ret
+label2:
+//min rax
+//max r9
+//middle r10
+//xmm1 logResult
+//xmm2 logSearch
+//calculate logResult
+movsd xmm1, [rsi + rdi * 8]
+mulsd xmm1, xmm0
+xor rax, rax
+mov r9, 256
+while2:
+cmp rax, r9
+jge endWhile2
+//calculate middle
+mov r10, rax
+add r10, r9
+sar r10, 1
+inc r10
+//calculate logSearch
+movsd xmm2, [rsi + r10 * 8]
+comisd xmm2, xmm1
+ja changeMax2
+//Change min:
+mov rax, r10
+jmp while2
+changeMax2:
+mov r9, r10
+dec r9
+jmp while2
+endWhile2:
+########################################################
 SHL r13, 8
 or r13, rax
+
+
+
 //PIXEL 3:
 PSRLDQ xmm3, 3
 movd edi, xmm3
-call calculateFunctionBinarySearch
+#call calculateFunctionBinarySearch
+######################################################## Copied function to save the time to call:
+//rdi input
+//rsi logValuesPointer
+//set rax to null
+and rdi, 0x00000000000000ff
+cmp rdi, 0
+jne label3
+xor rax, rax
+ret
+label3:
+//min rax
+//max r9
+//middle r10
+//xmm1 logResult
+//xmm2 logSearch
+//calculate logResult
+movsd xmm1, [rsi + rdi * 8]
+mulsd xmm1, xmm0
+xor rax, rax
+mov r9, 256
+while3:
+cmp rax, r9
+jge endWhile3
+//calculate middle
+mov r10, rax
+add r10, r9
+sar r10, 1
+inc r10
+//calculate logSearch
+movsd xmm2, [rsi + r10 * 8]
+comisd xmm2, xmm1
+ja changeMax3
+//Change min:
+mov rax, r10
+jmp while3
+changeMax3:
+mov r9, r10
+dec r9
+jmp while3
+endWhile3:
+########################################################
 SHL r13, 8
 or r13, rax
+
+
+
 //PIXEL 4:
 PSRLDQ xmm3, 3
 movd edi, xmm3
-call calculateFunctionBinarySearch
+#call calculateFunctionBinarySearch
+######################################################## Copied function to save the time to call:
+//rdi input
+//rsi logValuesPointer
+//set rax to null
+and rdi, 0x00000000000000ff
+cmp rdi, 0
+jne label4
+xor rax, rax
+ret
+label4:
+//min rax
+//max r9
+//middle r10
+//xmm1 logResult
+//xmm2 logSearch
+//calculate logResult
+movsd xmm1, [rsi + rdi * 8]
+mulsd xmm1, xmm0
+xor rax, rax
+mov r9, 256
+while4:
+cmp rax, r9
+jge endWhile4
+//calculate middle
+mov r10, rax
+add r10, r9
+sar r10, 1
+inc r10
+//calculate logSearch
+movsd xmm2, [rsi + r10 * 8]
+comisd xmm2, xmm1
+ja changeMax4
+//Change min:
+mov rax, r10
+jmp while4
+changeMax4:
+mov r9, r10
+dec r9
+jmp while4
+endWhile4:
+########################################################
 SHL r13, 8
 or r13, rax
+
+
+
 //PIXEL 5:
 PSRLDQ xmm3, 3
 movd edi, xmm3
-call calculateFunctionBinarySearch
+#call calculateFunctionBinarySearch
+######################################################## Copied function to save the time to call:
+//rdi input
+//rsi logValuesPointer
+//set rax to null
+and rdi, 0x00000000000000ff
+cmp rdi, 0
+jne label5
+xor rax, rax
+ret
+label5:
+//min rax
+//max r9
+//middle r10
+//xmm1 logResult
+//xmm2 logSearch
+//calculate logResult
+movsd xmm1, [rsi + rdi * 8]
+mulsd xmm1, xmm0
+xor rax, rax
+mov r9, 256
+while5:
+cmp rax, r9
+jge endWhile5
+//calculate middle
+mov r10, rax
+add r10, r9
+sar r10, 1
+inc r10
+//calculate logSearch
+movsd xmm2, [rsi + r10 * 8]
+comisd xmm2, xmm1
+ja changeMax5
+//Change min:
+mov rax, r10
+jmp while5
+changeMax5:
+mov r9, r10
+dec r9
+jmp while5
+endWhile5:
+########################################################
 SHL r13, 8
 or r13, rax
+
+
+
 //Save last byte:
 PSRLDQ xmm3, 3
 movd rax, xmm3
@@ -90,47 +311,4 @@ movdqu [r8], xmm3
 add r8, 15
 jmp 1b
 1:
-ret
-
-calculateFunctionBinarySearch:
-//xmm0 gamma
-//rdi input
-//rsi logValuesPointer
-//set rax to null
-and rdi, 0x00000000000000ff
-cmp rdi, 0
-jne label
-xor rax, rax
-ret
-label:
-//min rax
-//max r9
-//middle r10
-//xmm1 logResult
-//xmm2 logSearch
-//calculate logResult
-movsd xmm1, [rsi + rdi * 8]
-mulsd xmm1, xmm0
-xor rax, rax
-mov r9, 256
-while:
-cmp rax, r9
-jge endWhile
-//calculate middle
-mov r10, rax
-add r10, r9
-sar r10, 1
-inc r10
-//calculate logSearch
-movsd xmm2, [rsi + r10 * 8]
-comisd xmm2, xmm1
-ja changeMax
-//Change min:
-mov rax, r10
-jmp while
-changeMax:
-mov r9, r10
-dec r9
-jmp while
-endWhile:
 ret
