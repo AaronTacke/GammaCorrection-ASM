@@ -48,44 +48,44 @@ JB 1f //End of loop
 movdqu xmm3, [rbx]
 
 //PIXEL 1:
-movd edi, xmm1
+movd edi, xmm3
 call calculateFunctionBinarySearch
 mov r13, rax
 //PIXEL 2:
-PSRLDQ xmm1, 3
-movd edi, xmm1
+PSRLDQ xmm3, 3
+movd edi, xmm3
 call calculateFunctionBinarySearch
 SHL r13, 8
 or r13, rax
 //PIXEL 3:
-PSRLDQ xmm1, 3
-movd edi, xmm1
+PSRLDQ xmm3, 3
+movd edi, xmm3
 call calculateFunctionBinarySearch
 SHL r13, 8
 or r13, rax
 //PIXEL 4:
-PSRLDQ xmm1, 3
-movd edi, xmm1
+PSRLDQ xmm3, 3
+movd edi, xmm3
 call calculateFunctionBinarySearch
 SHL r13, 8
 or r13, rax
 //PIXEL 5:
-PSRLDQ xmm1, 3
-movd edi, xmm1
+PSRLDQ xmm3, 3
+movd edi, xmm3
 call calculateFunctionBinarySearch
 SHL r13, 8
 or r13, rax
 //Save last byte:
-PSRLDQ xmm1, 3
-movd rax, xmm1
+PSRLDQ xmm3, 3
+movd rax, xmm3
 SHL r13, 8
 or r13,rax
-movq xmm1, r13
-PSHUFB xmm1, xmm14
+movq xmm3, r13
+PSHUFB xmm3, xmm14
 
 
 //Move result to memory
-movdqu [rbx], xmm1
+movdqu [rbx], xmm3
 
 add rbx, 15
 jmp 1b
