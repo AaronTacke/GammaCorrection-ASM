@@ -92,7 +92,7 @@ int main(int argc, char *argv[]){
 
         //Print diagram if no gamma is set.
         if (gamma <= 0){
-            showDiagramData(0,30);
+            showDiagramData(0,100);
             exit(EXIT_SUCCESS);
         }
 
@@ -106,8 +106,8 @@ int main(int argc, char *argv[]){
         }
         //test with standard image
 
-        double time = calculateTime(arr, width, height, gamma, benchmarkIterations);
-        double compareTime = calculateCompareTime(arr, width, height, gamma, benchmarkIterations);
+        double time = calculateTime(arr, width, height, gamma, benchmarkIterations) / benchmarkIterations;
+        double compareTime = calculateCompareTime(arr, width, height, gamma, benchmarkIterations) / benchmarkIterations;
         printf("Optimized: %f\nNormal: %f\n",time, compareTime);
         exit(EXIT_SUCCESS);
     }
