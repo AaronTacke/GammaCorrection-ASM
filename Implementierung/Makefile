@@ -2,7 +2,7 @@
 CFLAGS=-O3 -g -Wall -Wextra
 
 #gamma: Main.c assembler/compareBoth.c ReadAndWritePPM.c TestAndBenchmarking.c assembler/calculateGrayscale.S
-gamma: Main.c assembler/compareGammacorrection.c ReadAndWritePPM.c TestAndBenchmarking.c assembler/calculateGammacorrectionWholeFunction.S
+gamma: Main.c assembler/compareGrayscale.c ReadAndWritePPM.c TestAndBenchmarking.c assembler/calculateGrayscale.S
 	gcc $(CFLAGS) -o $@ $^ -lm
 
 .PHONY: clean

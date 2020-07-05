@@ -13,4 +13,5 @@ int testImage(char* path, float gamma, char* outputPath);
 double calculateTime(uint8_t *arr, int width, int height, float gamma, int iterations);
 double calculateCompareTime(uint8_t *arr, int width, int height, float gamma, int iterations);
 uint8_t *getTestArray();
+void showDiagramData(int useGrayscale, int iterations);
 #endif //TEAM141_TEST_H

@@ -23,7 +23,7 @@ uint8_t *getTestArray() {
     //Place in the memory is allocated to save the image
     uint8_t *memory = (uint8_t *) malloc(width * height * 3 * sizeof(uint8_t)+15);
     if(memory==NULL){
-        printf("The test was not executed because the program is not able to make use of sufficient memory.\nPlease choose a smaller image.");
+        printf("The test was not executed because the program is not able to make use of sufficient memory.\nPlease choose a smaller image.\n");
     }
     //The Image is stored in the memory number by number.
     for (int i = 0; i < (width * height * 3); i++) {
@@ -38,7 +38,7 @@ uint8_t *copyTestArray(uint8_t *arr) {
     //Place in the memory is allocated to save the image
     uint8_t *memory = (uint8_t *) malloc(width * height * 3 * sizeof(uint8_t)+15);
     if(memory==NULL){
-        printf("The test was not executed because the program is not able to make use of sufficient memory.\nPlease choose a smaller image.");
+        printf("The test was not executed because the program is not able to make use of sufficient memory.\nPlease choose a smaller image.\n");
     }
     //The Image is stored in the memory number by number.
     for (int i = 0; i < (width * height * 3); i++) {
@@ -172,8 +172,8 @@ double calculateTime(uint8_t *arr, int width, int height, float gamma, int itera
     struct timespec end;
     clock_gettime(CLOCK_MONOTONIC, &end);
     double duration = end.tv_sec - start.tv_sec + 1e-9 *(end.tv_nsec - start.tv_nsec);
-    double averageTime = duration / iterations;
-    return averageTime;
+    //double averageTime = duration / iterations;
+    return duration;
 }
 
 double calculateCompareTime(uint8_t *arr, int width, int height, float gamma, int iterations){
@@ -185,6 +185,50 @@ double calculateCompareTime(uint8_t *arr, int width, int height, float gamma, in
     struct timespec end;
     clock_gettime(CLOCK_MONOTONIC, &end);
     double duration = end.tv_sec - start.tv_sec + 1e-9 *(end.tv_nsec - start.tv_nsec);
-    double averageTime = duration / iterations;
-    return averageTime;
+    //double averageTime = duration / iterations;
+    return duration;
+}
+
+uint8_t *getSquareImage(int useGrayscale, int size){
+    width = size;
+    height = size;
+    uint8_t *arr = (uint8_t *) malloc(width * height * 3 * sizeof(uint8_t)+15);
+    if(arr==NULL){
+        printf("The benchmark was not executed because the program is not able to make use of sufficient memory.\n");
+        exit(EXIT_FAILURE);
+    }
+    for(int i = 0; i < width*height*3; i+=3){
+        if(useGrayscale!=0){
+            uint8_t r = rand()%256;
+            *(arr + i) = r;
+            *(arr + i + 1) = r;
+            *(arr + i + 2) = r;
+        }else{
+            *(arr + i) = rand()%256;
+            *(arr + i + 1) = rand()%256;
+            *(arr + i + 2) = rand()%256;
+        }
+    }
+    return arr;
+}
+
+void showDiagramData(int useGrayscale, int iterations){
+    printf("ImageSize;durationC;durationASM\n");
+    for(int i = 100; i <= 2000; i+=100){
+        uint8_t* originalArray = getSquareImage(useGrayscale,i);
+        double cTime = 0;
+        double asmTime = 0;
+        for(float g = 0.2; g < 2.1; g+=0.2){
+            uint8_t* copyArray = copyTestArray(originalArray);
+            cTime += calculateCompareTime(copyArray,width,height,g, iterations);
+            free(copyArray);
+            copyArray = copyTestArray(originalArray);
+            asmTime += calculateTime(copyArray,width,height,g,iterations);
+            free(copyArray);
+        }
+        cTime = cTime/(iterations*8);
+        asmTime = asmTime/(iterations*8);
+        printf("%d;%f;%f\n",i,cTime,asmTime);
+        free(originalArray);
+    }
 }

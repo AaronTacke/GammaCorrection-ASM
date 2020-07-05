@@ -89,6 +89,13 @@ int main(int argc, char *argv[]){
             printf("You can not use an output path while benchmarking.\n");
             printUsageAndExit(name);
         }
+
+        //Print diagram if no gamma is set.
+        if (gamma <= 0){
+            showDiagramData(0,30);
+            exit(EXIT_SUCCESS);
+        }
+
         uint8_t* arr;
         if (inputPath[0] != '\0'){
             //test with given image
@@ -121,7 +128,6 @@ int main(int argc, char *argv[]){
         }
         //Check if gamma is valid
         if (gamma <= 0){
-            printf("Please enter a gamma value (-g) that is >= 0\n");
             printf("Please enter a gamma value (-g) that is > 0\n");
             exit(EXIT_FAILURE);
         }
