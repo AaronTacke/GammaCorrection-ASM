@@ -12,7 +12,7 @@ calculate_asm:
 //rdi: array pointer
 //rsi: width
 //rdx: height
-//rcx: gamma value
+//xmm0: gamma value
 //rax: return value (pointer to result array)
 mov rax, rdi
 
@@ -112,11 +112,6 @@ PSHUFB xmm3, xmm10
 PMULLD xmm1, xmm11
 PMULLD xmm2, xmm12
 PMULLD xmm3, xmm13
-
-//Store results in all bits
-//PSHUFB xmm1, xmm7
-//PSHUFB xmm2, xmm7
-//PSHUFB xmm3, xmm7
 
 //Add registers up
 PADDD xmm1, xmm2
