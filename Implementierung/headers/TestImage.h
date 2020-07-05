@@ -73,5 +73,5 @@ uint8_t testImageArray[] = {203, 255, 0, 164, 255, 0, 126, 255, 0, 87, 255, 0, 4
                             0, 255, 202, 0, 255, 241, 0, 231, 255, 0, 192, 255, 0, 154, 255, 0, 115, 255, 0, 77, 255, 0, 38,
                             255, 1, 0, 255, 39, 0, 255, 77, 0, 255, 117, 0, 255, 155, 0, 255, 193, 0, 255,
 
-                            0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; //TODO for testing to stop segFault with Assembler.
+                            0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; //extra Last 15 bytes so ASM-Code can iterate with xmm-Registers without checking.
 #endif //TEAM141_TESTIMAGE_H

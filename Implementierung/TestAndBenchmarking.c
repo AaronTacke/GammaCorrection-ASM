@@ -42,7 +42,7 @@ uint8_t *getTestArray() {
     height = 16;
     //Place in the memory is allocated to save the image
     uint8_t *memory = (uint8_t *) malloc(width * height * 3 * sizeof(uint8_t));
-    if(memory==0){
+    if(memory==NULL){
         printf("The test was not executed because the program is not able to make use of sufficient memory.\nPlease choose a smaller image.");
     }
     //The Image is stored in the memory number by number.
@@ -57,7 +57,7 @@ uint8_t *getTestArray() {
 uint8_t *copyTestArray(uint8_t *arr) {
     //Place in the memory is allocated to save the image
     uint8_t *memory = (uint8_t *) malloc(width * height * 3 * sizeof(uint8_t));
-    if(memory==0){
+    if(memory==NULL){
         printf("The test was not executed because the program is not able to make use of sufficient memory.\nPlease choose a smaller image.");
     }
     //The Image is stored in the memory number by number.

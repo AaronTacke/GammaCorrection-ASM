@@ -87,7 +87,7 @@ PSHUFB xmm1, xmm14
 //Move result to memory
 movdqu [rbx], xmm1
 
-add rdi, 15
+add rbx, 15
 jmp 1b
 1:
 ret
