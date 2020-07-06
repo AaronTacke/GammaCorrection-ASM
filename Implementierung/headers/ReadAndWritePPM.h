@@ -10,4 +10,7 @@ int width;
 int height;
 uint8_t* readPicture(char* path);
 int writePicture(char* path, uint8_t image[]);
+uint8_t *unalignArray(uint8_t *alignedArray);
+uint8_t *alignArray(uint8_t *oldArray);
+void aligned_free(void *p);
 #endif //TEAM141_READANDWRITEPPM_H

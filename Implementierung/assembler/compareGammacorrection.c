@@ -8,7 +8,6 @@ void calculate(uint8_t *arr, int width, int height, float gamma){
 	//We have 3 values for every pixel, so the total number of values is:
 	int length = width*height*3;
 	for(int i = 0; i < length; i+=3){ //For every pixel:
-		//Grayscale filter using formula (1) of the exercise
 		uint8_t d = *(arr+i);
 		//Gamma control using formula (2) of the exercise
 		float p = powf((float)d / 255, gamma) * 255;

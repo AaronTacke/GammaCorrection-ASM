@@ -82,10 +82,7 @@ mov r8, rdi
 imul rsi, rdx
 imul rsi, 3
 add rsi, r8
-//r11 points to first byte that is not part of the array.
-mov r11, rsi
-//rcx logValuesPointer
-lea rsi, [rip + logValues]
+//rsi points to first byte that is not part of the array.
 
 //ByteMask to Shift result bytes all over xmm register:
 pxor xmm14, xmm14
@@ -98,7 +95,7 @@ por xmm14, xmm15
 
 
 1://Begin of loop
-cmp r11, r8
+cmp rsi, r8
 JB 1f //End of loop
 
 movdqu xmm3, [r8]

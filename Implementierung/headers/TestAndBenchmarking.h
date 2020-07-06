@@ -6,6 +6,11 @@
 //The tests will use the method of compare.h and detect differences
 //It uses different gamma values. Wrong pixels will be printed.
 
+//calculateTime and calculateCompareTime can be used for benchmarking with special parameters / images.
+//showDiagramData is used to create a csv-style data table that shows benchmarking results.
+
+//getTestArray() returns the testArray of TestImage.h with specified width and height.
+
 #ifndef TEAM141_TEST_H
 #define TEAM141_TEST_H
 int test(float gamma, char* outputPath);
