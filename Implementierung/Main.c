@@ -109,6 +109,7 @@ int main(int argc, char *argv[]){
             arr2 = alignArray(arr1);
         }else{
             //test with standard image
+            //TODO Benchmark with big random array, not little test array.
             arr1 = getTestArray();
             arr2 = alignArray(arr1);
         }

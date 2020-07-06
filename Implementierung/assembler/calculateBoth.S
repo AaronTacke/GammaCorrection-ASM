@@ -185,10 +185,10 @@ PADDD xmm3, xmm2
 PADDD xmm3, xmm1
 
 //Move results to all Bytes in xmm Register
-PSHUFB xmm3, xmm7 //TODO dieses kann ich sparen.
+PSHUFB xmm3, xmm7
 
 //Place last byte (stored in xmm0) back
-POR xmm3, xmm0 //TODO dieses kann auch wegoptimiert werden
+POR xmm3, xmm0
 
 
 xor rdx, rdx

@@ -115,7 +115,7 @@ PADDD xmm1, xmm2
 PADDD xmm1, xmm3
 
 //Move results to all Bytes in xmm Register
-PSHUFB xmm1, xmm7 //TODO Zeitmessen mit weniger PSHUFB (vielleicht auf Gamma-Funktion opitimiert?)
+PSHUFB xmm1, xmm7
 
 
 //Move result to memory
