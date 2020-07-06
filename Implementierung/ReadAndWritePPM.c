@@ -9,6 +9,15 @@ int height;
 
 int numberOfColorPortions;
 
+/* This file offers methods to read and write a PPM file.
+ *
+ * uint8_t readPicture(char* path):
+ * It checks if the file is correct and creates a pixel array if so.
+ *
+ * writePicture(char* path, uint8_t image[])
+ * It saves a pixel array into a correct file.
+ */
+
 
 void wrongFormatAndExit(){
     printf("The file has a wrong format.\n"
@@ -16,11 +25,11 @@ void wrongFormatAndExit(){
     exit(0);
 }
 
-
 uint8_t* readPicture(char* path){
     char buffer[NUMBEROFCHARSPERLINE];
     FILE *file = fopen(path, "r");
 
+    //Check to stop seg-faults:
     if(file == NULL){
         printf("The file %s was not found.\n", path);
         exit(0);
@@ -59,10 +68,12 @@ uint8_t* readPicture(char* path){
     }
     char *ptrSpace = strtok(buffer, delimiter);
 
+    //Get information out of file:
     width = atoi(ptrSpace);
     ptrSpace = strtok(NULL, delimiter);
     height = atoi(ptrSpace);
 
+    //Image has to have pixel:
     if(width<1 || height<1) {
         printf("The image does not specify its width and height\n"
                "Please only use PPM files with the ASCII-format!\n");
@@ -108,7 +119,7 @@ uint8_t* readPicture(char* path){
 
     return pixels;
 }
-void writePicture(char* path, uint8_t image[]){
+void writePicture(char* path, uint8_t image[]) {
     FILE *file = fopen(path, "w");
     if (file != NULL) {
         //Write first two lines in file
@@ -120,23 +131,69 @@ void writePicture(char* path, uint8_t image[]){
         fprintf(file, "255\n");
         //Write all new RGB Values
         int lengthOfArray = width * height * 3;
-        for(int i = 0; i < lengthOfArray; i++) {
+        for (int i = 0; i < lengthOfArray; i++) {
             fprintf(file, "%d\n", image[i]);
         }
         fclose(file);
-    } else{
+    } else {
         printf("Saving the image was not possible.\n The program needs access rights for file %s\n", path);
         exit(0);
     }
 }
 
-//int main() {
-//    uint8_t* pixels = readPicture("C://Test//bild2.ppm");
-//    char* path = "C://Test//umgewandelt.ppm";
-//    writePicture(path, pixels);
-//    free(pixels);
-//    return 0;
-//}
+
+//########################################################################################
+    //Code from https://stackoverflow.com/questions/38088732/explanation-to-aligned-malloc-implementation
+    //Visited on 6th of July 2020, 17:10.
+    //Copied following 2 methods to allocate aligned memory
+    void* aligned_malloc(size_t required_bytes, size_t alignment){
+        void* p1; // original block
+        void** p2; // aligned block
+        int offset = alignment - 1 + sizeof(void*);
+        if ((p1 = (void*)malloc(required_bytes + offset)) == NULL)
+        {
+            return NULL;
+        }
+        p2 = (void**)(((size_t)(p1) + offset) & ~(alignment - 1));
+        p2[-1] = p1;
+        return p2;
+    }
+    void aligned_free(void *p){
+        free(((void**)p)[-1]);
+    }
+//#######################################################################################
+
+
+
+    uint8_t *alignArray(uint8_t* oldArray){
+        uint8_t* pixels = (uint8_t*) aligned_malloc(1.2 * width * height * 3 * sizeof(uint8_t)+15, 64);
+        if(pixels==NULL){
+            printf("Error when allocating aligned memory. Please choose smaller image or insert bigger RAM\n");
+        }
+        int position = 0;
+        for(int i = 0; i < width*height*3; i+=15){
+            for(int j = 0; j < 16; j++){
+                *(pixels + position + j) = *(oldArray + i + j);
+            }
+            position += 16;
+        }
+        return pixels;
+    }
+    uint8_t *unalignArray(uint8_t* alignedArray){
+        uint8_t* pixels = (uint8_t*) malloc(width * height * 3 * sizeof(uint8_t)+15);
+        if(pixels==NULL){
+            printf("Error when allocating aligned memory. Please choose smaller image or insert bigger RAM\n");
+        }
+        int position = 0;
+        for(int i = 0; i < width*height*3; i+=15){
+            for(int j = 0; j < 16; j++){
+                *(pixels + i + j) = *(alignedArray + position + j);
+            }
+            position += 16;
+        }
+        return pixels;
+    }
+
 
 
 
