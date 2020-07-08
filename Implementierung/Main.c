@@ -34,7 +34,7 @@ int main(int argc, char *argv[]){
     char *outputPath = "";
     int testFlag = 0;
     int benchmarkFlag = 0;
-    int benchmarkIterations = 20;
+    int benchmarkIterations = -1;
     //To know wether a gamma was specified gamma starts with -1 (illegal state).
     float gamma = -1;
     char opt;
@@ -61,21 +61,13 @@ int main(int argc, char *argv[]){
                 testFlag = 1;
                 break;
             case 'b':
+                checkForValidArgument(name, opt);
                 benchmarkFlag = 1;
-                if (optarg != NULL){
-                    checkForValidArgument(name, opt);
-                    benchmarkIterations = atoi(optarg);
-                }
+                benchmarkIterations = atoi(optarg);
                 break;
             case 'h':
                 //Show "Help page"
                 printUsageAndExit(name);
-                break;
-            case ':':
-                if (optopt != 'b'){
-                    printUsageAndExit(name);
-                }
-                benchmarkFlag = 1;
                 break;
             default:
                 printUsageAndExit(name);
