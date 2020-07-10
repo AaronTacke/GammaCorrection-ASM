@@ -48,7 +48,7 @@ uint8_t *getTestArray() {
     return memory;
 }
 
-//Copys an array to be able to call different calculate functions on it
+//Copies an array to be able to call different calculate functions on it
 //Uses width and height parameters (Have to be set before method can be used).
 uint8_t *copyTestArray(uint8_t *arr) {
     //Place in the memory is allocated to save the image

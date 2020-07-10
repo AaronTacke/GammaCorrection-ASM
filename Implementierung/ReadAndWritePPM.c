@@ -83,7 +83,7 @@ uint8_t* readPicture(char* path){
     //numberOfColorPortions is set
     if(fgets(buffer, NUMBEROFCHARSPERLINE, file) != NULL){
         numberOfColorPortions = atoi(buffer);
-        //If the image has the not 255 as maxValue
+        //If the image has the not 255 as maxValue an error message is printed
         if(numberOfColorPortions != 255){
             printf("Only the pixel format with maxValue = 255 is supported.\nFound format with maxValue = %d.\n"
                    "Please only use PPM files with the ASCII-format!\n", numberOfColorPortions);
