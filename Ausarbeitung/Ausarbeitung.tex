@@ -65,6 +65,21 @@ Da $p_{alt} \in \lbrack255\rbrack$, $p_{neu} \in \lbrack255\rbrack$ und sich abe
 \subsection{Berechnung aller Gammafunktionen}
 Die zwei Erkenntnisse über die endliche Anzahl an unterschiedlichen Gammafunktionen und über das Monotonieverhalten nutzen wir, um mit Hilfe eines C-Programms Intervalle für $\gamma$ zu berechnen, in denen die jeweiligen Gammafunktionen für jeden Eingabewert von $0-255$ die gleiche Ausgabe liefern. Hierfür verwendeten wir Bisektion, indem mit zwei aufeinanderfolgenden float Werten gestartet und die Größe des Intervalls zunächst so lange verdoppelt wird, bis sich die Funktionswerte an den Intervallgrenzen unterscheiden. Von diesem neuen Intervall wird die Mitte und der Funktionswert an der mittleren Stelle berechnet. Ist dieser neue Wert gleich dem Funktionswert der rechten Intervallgrenze, wird das linke Intervall weiter verkleinert, wenn nicht wird das rechte verkleinert. Dies wird solange fortgeführt bis die Stelle gefunden wurde, an der sich für zwei aufeinanderfolgende float Werte die Funktionswerte unterscheiden. Nach Ausführung des Programms speicherten wir die 64484 Werte in einer Headerdatei ab, um bei späteren Tests über einen schnellen Zugriff zu verfügen.         
 
+\subsection{Effiziente Speicherung von vorberechneten Gammafunktionen}
+Mittels Binärer Suche implementierten wir einen Algorithmus, der es ermöglichte für ein gegebenes $\gamma$ die vorberechnenten Werte der Gammafunktion zu bestimmen.  Dabei stellte sich aber heraus, dass die Zeit für das Kompilieren der großen Headerdatei ca. eine halbe Minut in Anspruch nahm. Aus diesem Grund beschäftigten wir uns damit, wie eine effiziente Speicherung von Gammafunktionen aussehen könnte, um weniger Daten abspeichern zu müssen. 
+\\
+\newline
+\noindent
+Als erste Verbesserung stellte sich heraus, dass die Hälfte der Gammafunktionen ausreichen würde aufgrund ihrer Symmetrie zur Winkelhalbierenden. %TODO stimmt das wirklich ??? Dafür müssten wird doch den Kehrbruch bilden können und damit hatten wir doch Probleme.
+\\
+\newline
+\noindent
+Für die zweite Optimierung des Speicherplatzes nutzten wir die Monotonieeigenschaft der Gammafunktion. Da diese monoton steigend ist, reicht es aus abzuspeichern um wie viel der nächste y-Wert größer ist als der vorherige. Dies bedeutet, dass sich jede Gammafunktion binär repräsentieren lässt, indem die Anzahl der Nullen vor der nten $1$ den nten Funktionswert liefern. Abbildung bla zeigt Ein Beispiel...
+
+\\
+\newline
+\noindent
+Weil die Gammafunktionen jeweils nur 256 Funktionswerte aus dem Wertebereich zwischen $0$ und $255$ besitzen, lässt sich so jede Funktion mit nur 16 Bytes abspeichern. Um dem Compiler das Einlesen der Zahlen zu erleichtern, speicherten wir die Funktionen im Hexadezimalsystem ab.  
 \subsection{Berechnung der Wurzel}
 Eine weitere Methode, um $\sqrt[n]{z}$ zu berechnen, ist diese als Nullstelle des Polynoms $f(x)=x^n-z$ auszudrücken und diese mit verschiedenen Verfahren zur Nullstellenapproximation wie zum Beispiel dem Newtonverfahren anzunähern. Weil man aber selbst für das schnell konvergierende Newtonverfahren mehrmals verschiedene Funktionswerte von $f(x)$ berechnen muss, stellte sich dieses Verfahren als nicht effizient genug heraus.     
 
@@ -127,7 +142,7 @@ So nutzen Sie Literaturverweise \cite{aristotle:physics}.
 
 
 \section{Zusammenfassung und Ausblick}
-\subsection{Effiziente Speicherung von vorberechneten Gammafunktionen}
+
 
 % TODO: Fuegen Sie Ihre Quellen der Datei Ausarbeitung.bib hinzu
 % Referenzieren Sie diese dann mit \cite{}.
