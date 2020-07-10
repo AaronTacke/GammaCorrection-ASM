@@ -20,13 +20,11 @@ calculate_asm:
 //rdx: height
 //xmm0: gamma value
 //rax: return value (pointer to result array)
-
-//calculateWholeFunction:
-//xmm0 gamma
-CVTPS2PD xmm0, xmm0
 //logArray rcx
 //gammaArray r10
 //functionArray r11
+
+CVTPS2PD xmm0, xmm0
 lea rcx, [rip + logValues]
 lea r11, [rip + gammaValues]
 lea r10, [rip + result]
@@ -67,11 +65,9 @@ inc r9
 jmp whileLoop
 endWhileLoop:
 mov byte ptr [r10 + 255], 255
-//FUNCITON NOW IS STARTING AT R10
-
+//FUNCTION NOW IS STARTING AT R10
 
 mov rax, rdi
-
 imul rsi, rdx
 imul rsi, 3
 add rsi, rdi

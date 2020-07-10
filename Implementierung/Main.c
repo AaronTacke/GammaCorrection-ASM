@@ -1,7 +1,6 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdint.h>
 #include "headers/TestAndBenchmarking.h"
 #include "headers/ReadAndWritePPM.h"
@@ -46,21 +45,26 @@ int main(int argc, char *argv[]){
     while ((opt = getopt(argc, argv, ":i:g:to:b:h")) != -1) {
         switch (opt) {
             case 'i':
+                //input path parameter
                 checkForValidArgument(name, opt);
                 inputPath = optarg;
                 break;
             case 'o':
+                //output path parameter
                 checkForValidArgument(name, opt);
                 outputPath = optarg;
                 break;
             case 'g':
+                //gamma parameter
                 checkForValidArgument(name, opt);
                 gamma = atof(optarg);
                 break;
             case 't':
+                //test parameter
                 testFlag = 1;
                 break;
             case 'b':
+                //benchmark parameter
                 checkForValidArgument(name, opt);
                 benchmarkFlag = 1;
                 benchmarkIterations = atoi(optarg);
@@ -74,12 +78,11 @@ int main(int argc, char *argv[]){
         }
     }
 
-    //Only Bencharking OR testing is allowed at once, not both.
+    //Only benchmarking OR testing is allowed at once, not both.
     if(benchmarkFlag==1 && testFlag==1){
         printf("Please only use -t (for testing) OR -b (for benchmarking)!\n");
         printUsageAndExit(name);
     }
-
 
     if(benchmarkFlag==1){
         //Benchmarking:

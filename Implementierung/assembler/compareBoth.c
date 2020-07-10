@@ -4,7 +4,7 @@
 
 //An implementation of the calculation to test and compare our assembly code to.
 void calculate(uint8_t *arr, int width, int height, float gamma){
-	//Values for a, b and c are going to be stored seperately later. 
+	//Values for a, b and c are going to be stored separately later.
 	//(And will be adapted again after implementation)
 	int a = 77;
 	int b = 151;

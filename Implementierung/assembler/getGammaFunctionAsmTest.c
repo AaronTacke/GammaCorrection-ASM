@@ -41,7 +41,7 @@ uint8_t calculateResult(float gamma, int input) {
 }
 
 
-//This method uses a similar algorithm to the merge-algorith of mergesort
+//This method uses a similar algorithm to the merge-algorithm of mergesort
 //To find all values (1-254) that belong to one gamma
 uint8_t* calculateResultArrayFast(float gamma) {
     //In assembler this is done before (in section .data):
@@ -55,7 +55,6 @@ uint8_t* calculateResultArrayFast(float gamma) {
     for(int i = 0; i < 254; i++){
         *(gammaArray+i) = *(logArray+i) * gamma;
     }
-
 
     while(gammaCounter<255){
         //Maybe the multiplication with gamma should happen directly here?

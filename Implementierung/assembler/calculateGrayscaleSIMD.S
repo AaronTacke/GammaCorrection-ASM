@@ -15,7 +15,6 @@ calculate_asm:
 //xmm0: gamma value
 //rax: return value (pointer to result array)
 mov rax, rdi
-
 imul rsi, rdx
 imul rsi, 3
 add rsi, rdi
@@ -30,6 +29,7 @@ PSLLDQ xmm8, 8
 mov rcx, 0xffffff03ffff00ff
 movq xmm15, rcx
 por xmm8, xmm15
+
 //Prepare Byte-Mask for b-PSHUFB
 //0xffff0eff ff0bff08 ffffff05 ffff02ff
 pxor xmm9, xmm9
@@ -39,6 +39,7 @@ PSLLDQ xmm9, 8
 mov rcx, 0xffffff04ffff01ff
 movq xmm15, rcx
 por xmm9, xmm15
+
 //Prepare Byte-Mask for c-PSHUFB
 //0xffff0dff ff0aff07 ffffff04 ffff01ff
 pxor xmm10, xmm10
@@ -76,6 +77,7 @@ movq xmm11, rcx
 PSLLDQ xmm11, 8
 movq xmm15, rcx
 por xmm11, xmm15
+
 //Prepare Byte-Mask for b-multiplicatoin (b=151=0x97)
 pxor xmm12, xmm12
 mov rcx, 0x9700000097 //Doubled because we may change b value
@@ -83,6 +85,7 @@ movq xmm12, rcx
 PSLLDQ xmm12, 8
 movq xmm15, rcx
 por xmm12, xmm15
+
 //Prepare Byte-Mask for c-multiplicatoin (a=28=0x1C)
 pxor xmm13, xmm13
 mov rcx, 0x1C0000001C

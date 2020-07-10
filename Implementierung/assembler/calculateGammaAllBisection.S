@@ -12,9 +12,6 @@ _calculate_asm:
 call calculate_asm
 ret
 
-
-
-
 calculate_asm:
 //Register Usage:
 //rdi: array pointer
@@ -22,13 +19,10 @@ calculate_asm:
 //rdx: height
 //xmm0: gamma
 //rax: return value (pointer to result array)
-
-
-//calculateWholeFunction:
-//xmm0 gamma
-CVTPS2PD xmm0, xmm0
 //logArray rcx
 //gammaArray r11
+
+CVTPS2PD xmm0, xmm0
 lea rcx, [rip + logValues]
 lea r10, [rip + result]
 
@@ -71,12 +65,9 @@ endLoop:
 mov byte ptr [r10 + 255], 255
 //FUNCITON NOW IS STARTING AT R10
 
-
-
 mov rax, rdi
 //new array-Pointer: r8
 mov r8, rdi
-
 imul rsi, rdx
 imul rsi, 3
 add rsi, r8
@@ -146,7 +137,6 @@ SHL r13, 8
 or r13,rax
 movq xmm3, r13
 PSHUFB xmm3, xmm14
-
 
 //Move result to memory
 movdqu [r8], xmm3

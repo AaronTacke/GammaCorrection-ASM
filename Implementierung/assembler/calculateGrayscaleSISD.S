@@ -15,7 +15,6 @@ calculate_asm:
 //xmm0: gamma value
 //rax: return value (pointer to result array)
 mov rax, rdi
-
 imul rsi, rdx
 imul rsi, 3
 add rsi, rdi
