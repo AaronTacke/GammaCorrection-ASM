@@ -106,8 +106,9 @@ p_{neu} \cdot 255^\gamma = {p_{alt}}^{\gamma}
 \end{align}
 
 \subsection{Vergleichsimplementierung}
+\subsection{Intuitve Bestimmung des Graustufenfilters}
 
-\subsection{Bestimmung des besten Graustufenfilters}
+\subsection{Anpassung des Graustufenfilters auf das menschliche Auge}
 Um den Einfall von Licht wahrzunehmen, befinden sich in der Retina des Auges sogenannte Stab- und Zapfenzellen, beide eine Art modfizierte Nervenzelle, welche Photonen (Licht) absorbieren können, und ein entsprechendes elektrisches Signal Richtung Gehirn weiterleiten.
 Die Farbwahrnehmung beider lässt sich durch eine sogenannte Absorptionskurve beschreiben, welche angibt, welche Wellenlängen (Farben) am stärksten absorbiert, in elektrische Signale umgewandelt und somit wahrgenommen werden.
 Zapfenzellen erzeugen bei guter Beleuchtung scharfe Bilder, wohingegen Stabzellen für das Sehen bei geringem Licht und in peripheren Blickwinkeln verantwortlich sind. Somit müssen wir uns für die Wahl der Gewichtung von Farben für den Graustufenfilter lediglich an der Absorptionskurve von Zapfenzellen orientieren.
@@ -121,10 +122,10 @@ Die Empfindung von Helligkeit des menschlichen Auges ist logarithmisch und folgt
 \\
 \newline
 Ein weiterer Vorteil der Gammakorrektur besteht in der Aufhellung oder der Abdunklung von Fotos. So werden durch die Exponentialfunktion die dunkleren Pixel stärker aufgehellt als die die helleren Pixel. \cite{gammKorrekturWikipedia}
-Dadurch bleibt das Helligkeitsspektrum erhalten und das %TODO........Das verstehe ich noch nicht ganz sollten wir vielleicht gemeinsam machen
+Dadurch bleibt das Helligkeitsspektrum erhalten und das Bild wirkt realistischer. 
 \\
 \newline
-Im folgenden sind mehrere Bilder zu sehen, auf die Gammakorrekturen mit unterschiedlichen Werten für $\gamma$ angewendet worden sind, um die Wirkung der Gammafunktion zu demonstrieren.    
+Im Folgenden sind mehrere Bilder zu sehen auf die Gammakorrekturen mit unterschiedlichen Werten für $\gamma$ angewendet worden sind, um die Wirkung der Gammafunktion zu demonstrieren.    
 
 \begin{figure}[h]
     \begin{minipage}{0.49\linewidth}
@@ -139,9 +140,7 @@ Im folgenden sind mehrere Bilder zu sehen, auf die Gammakorrekturen mit untersch
         \includegraphics[scale=1.2]{Images/fruit_basket_gamma_1,25.png}
         \caption{Korrektur mit $\gamma = 1,25$}
     \end{minipage}
-\end{figure}
-
-\begin{figure}[h]
+    %\hfill
     \begin{minipage}{0.49\linewidth}
         \centering
         \includegraphics[scale=1.2]{Images/fruit_basket_gamma_0,5.png}
@@ -156,15 +155,27 @@ Im folgenden sind mehrere Bilder zu sehen, auf die Gammakorrekturen mit untersch
     \end{minipage}
 \end{figure}
 
-An den Bildern ist zu erkennen, dass für $\gamma > 1$ die Bilder dunkler werden und sich der Kontrast erhöht. Dieser Effekt ist damit zu begründen, dass in der Gammafunktion Werte kleiner als eins potenziert werden und dadurch ein kleiner Grauwert entsteht.
-\\
-\newline
 \noindent
-Ist $\gamma$ aber kleiner als 1 bedeutet dies es wird die nte Wurzel einer Zahl kleiner als 1 berechnet, die anschließend potenziert wird, wodurch eine größere Zahl entsteht und daher ein größerer Grauwert für jed Penixel entsteht, der heller dargestellt wird.
-\\
-\newline
+An den Bildern ist zu erkennen, dass für $\gamma > 1$ die Bilder dunkler werden und sich der Kontrast erhöht. Dieser Effekt lässt sich am besten Verstehen, wenn man die zugehörigen Graphen der unterschiedlichen Gammafunktionen betrachtet. So verlaufen alle Graphen mit $\gamma < 1$  unter dem Graphen $f(x)=x$. Dies bedeutet der Grauwert wird kleiner und das Bild wird dunkler dargestellt. Alle Funktionen mit $\gamma ' = \frac{1}{\gamma}$ stellen die Umkehrfunktion zur Funktion mit $\gamma$ dar und sind deshalb symmetrisch zur Winkelhalblierenden des ersten Quadranten. Daher verlaufen diese Funktionen oberhalb des Graphen von $f(x)$ und liefern größere Grauwerte. Das bearbeitete Bild wird daher heller dargestellt. 
+
 \noindent
-Der perfekte Wert für $\gamma$ lässt sich im Vorfeld für nicht bestimmen. Abhängig von der 
+Zudem ist interessant, dass die Gammafunktion nicht jeden Grauwert gleich stark verändert. Abbildung 5 zeigt um wie viel sich die Helligkeit eines Pixels durch die jeweilige Gammafunktion verändert. Da es sich hier um keinen konstanten Wert handelt, werden zu Beispiel für $\gamma = 0.5$ die dunklen Pixel stärker aufgehellt als die hellen. Dies erzeugt einen besseren Kontrast??????
+\newline
+Der perfekte Wert für $\gamma$ lässt sich im Vorfeld nicht bestimmen, denn dieser ist abhängig von der Belichtung und dem Kontrast des aufgenommenen Fotos.
+\begin{figure}[h]
+    \begin{minipage}{0.49\linewidth}
+        \centering
+        \includegraphics[scale=0.75]{Images/GammafunctionsDistanceToX.PNG}
+        \caption{Korrektur mit $\gamma = 0,5$}
+    \end{minipage}
+    %\hfill
+    \centering
+    \begin{minipage}{0.49\linewidth}
+        \centering
+        \includegraphics[scale=0.75]{Images/GammafunctionsPlotFor2And0,5.PNG}
+        \caption{Korrektur mit $\gamma = 2.0,$}
+    \end{minipage}
+\end{figure}
 \section{Korrektheit/Genauigkeit}
 \subsection{Berechnung aller möglichen Gammafunktionen}
 Uns war es wichtig, für jedes positives $\gamma$, das mit einem float dargestellt werden kann, den korrekten Wert zu berechnen und so die Berechnung nicht unnötig einzuschränken. Da wir alle möglichen Gammafunktionen kennen, können wir für unser Programm garantieren, dass jeder $\gamma$ Wert korrekt berechnet wird. 
