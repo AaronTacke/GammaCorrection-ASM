@@ -1,8 +1,11 @@
 #include <stdint.h>
 #include <stdio.h>
-#include "GammaFunctions.h"
-#include "GammaValues.h"
+//#include "GammaFunctions.h"
+//#include "GammaValues.h"
+#include "encodedFunctionsSmall.h"
 
+extern void decodeFunction(long long *compressedFunction, uint8_t *result);
+/*
 void calculateOptimized(uint8_t *arr, int width, int height, float gamma){
     //BinarySearch for the correct GammaFunction:
     int min = 0;
@@ -35,5 +38,16 @@ void calculateOptimized(uint8_t *arr, int width, int height, float gamma){
         *(arr+i) = (uint8_t) p;
         *(arr+i+1) = (uint8_t) p;
         *(arr+i+2) = (uint8_t) p;
+    }
+    */
+    void decode(uint8_t *result, int indexOfFunction){
+        decodeFunction(compressedFunctionsSmall[indexOfFunction * 8], result)
+    }
+    void main() {
+        uint8_t *result[256];
+        decode(result, 1);
+        for (int i = 0; i < 256; ++i) {
+            printf("%d\n", result[i])
+        }
     }
 }

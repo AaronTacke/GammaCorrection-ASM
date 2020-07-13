@@ -2,10 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-
-#include "GammaFunctionsSmall.h"
-unsigned long long encodedFunctions[5][8];
-
+#include "GammaFunctions.h"
+unsigned long long encodedFunctions[64484][8];
 void convertFunction(uint8_t function[], int indexOfFunction){
     bool binaryArray[512];
 
@@ -49,7 +47,7 @@ void convertFunction(uint8_t function[], int indexOfFunction){
 void writeEncodedFunctions() {
     FILE *file = fopen("encodedFunctions.txt", "a+");
     if (file != NULL) {
-        for(int i = 0; i < 5; i++) {
+        for(int i = 0; i < 64484; i++) {
             for (int j = 0; j < 8; j++) {
                 fprintf(file, "%llu,", encodedFunctions[i][j]);
             }
@@ -66,7 +64,7 @@ int main() {
     int counter = 0;
     uint8_t function[256];
 
-    for(int i = 0; i <  5; i++){
+    for(int i = 0; i < 64484; i++){
         for(int j = 0; j < 256; j++){
             function[j] = gammaFunctions[counter];
             counter++;
