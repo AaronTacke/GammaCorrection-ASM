@@ -18,7 +18,7 @@ xor rdx, rdx
 
 loop:
 cmp rdx, 128
-je next
+je loop2
 psllq xmm0, 1
 jo wasOne
 //was 0
@@ -32,7 +32,7 @@ jmp loop
 
 loop2:
 cmp rdx, 128
-je next
+je loop3
 psllq xmm1, 1
 jo wasOne2
 //was 0
@@ -45,7 +45,7 @@ jmp loop
 
 loop3:
 cmp rdx, 128
-je next
+je loop4
 psllq xmm2, 1
 jo wasOne3
 //was 0
@@ -58,7 +58,7 @@ jmp loop
 
 loop4:
 cmp rdx, 128
-je next
+je end
 psllq xmm3, 1
 jo wasOne4
 //was 0
@@ -68,5 +68,6 @@ inc rcx
 mov [rsi + rcx], rax
 inc rdx
 jmp loop
+end:
 ret
 
