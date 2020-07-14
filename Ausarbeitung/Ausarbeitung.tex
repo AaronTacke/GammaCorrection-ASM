@@ -107,7 +107,24 @@ p_{neu} \cdot 255^\gamma = {p_{alt}}^{\gamma}
 
 \subsection{Vergleichsimplementierung}
 \subsection{Intuitve Bestimmung des Graustufenfilters}
-
+Die einfachste Form des Graustufenfilters, bei der nur der Durchschnitt der einzelnen Farbwerte mit Hilfe von (1) berechnet wird, nutzt $a=b=c=1$ als Parameter. Bei dieser einfachen Umwandlung wird jedoch fälschlicherweise angenommen, dass alle Farben vom menschlichen Auge gleich hell wahrgenommen werden. Die eigentliche Farbwahrnehmung unterscheidet sich jedoch von dieser Vorstellung, da beispielsweise die Farbe grün heller wahrgenommen wird als blau. Um diese Informationen bei der Umwandlung in Graustufen beizubehalten, müssen die Parameter a,b und c so angepasst werden, dass die Helligkeit in dem Graustufenbild der menschlichen Wahrnehmung der Farben auf dem ursprüglichen Bild entspricht.
+	\begin{figure}[h]
+		\begin{minipage}{0.49\linewidth}
+			\centering
+			%TODO funktioniert mit fruit_basket_original.png ganz normal, muss aber grey_standard sein
+			\includegraphics[scale=1.2]{Images/fruit_basket_original.png}
+			\caption{Ohne Gewichtung}
+		\end{minipage}
+		%\hfill
+		\centering
+		\begin{minipage}{0.49\linewidth}
+			\centering
+			%TODO funktioniert mit fruit_basket_original.png ganz normal, muss aber grey_improved sein
+			\includegraphics[scale=1.2]{Images/fruit_basket_original.png}
+			\caption{Gewichtung mit $a=..., b=..., c=...$}
+		\end{minipage}
+	\end{figure}
+	Im Vergleich der beiden Bilder ist zu erkennen, dass die Farben mit einer sinnvollen gewichtung des Graustufenfilters viel realistischer in Graustufen umgewandelt werden. So sind die als heller wahrgenommenen Farben wie gelb oder grün auch in dem Graustufenbild deutlich heller dargestellt und lassen sich somit besser von den anders farbigen Objekten unterscheiden. In dem ersten Bild hingegen lässt sich kein eindeutiger Farbunterschied zwischen den einzelnen Früchten erkennen. Es ist somit deutlich, dass die Wahl der Paramter eine entscheidende Rolle für die realistische Umwandlung eines farbigen Bildes in Graustufen spielt. Wie ein möglichst idealer Wert, der nicht nur auf Intuition basiert, sondern an die menschliche Farbwahrnehmung angepasst ist, bestimmt werden kann, wird im Folgenden erläutert.
 \subsection{Anpassung des Graustufenfilters auf das menschliche Auge}
 Um den Einfall von Licht wahrzunehmen, befinden sich in der Retina des Auges sogenannte Stab- und Zapfenzellen, beide eine Art modfizierte Nervenzelle, welche Photonen (Licht) absorbieren können, und ein entsprechendes elektrisches Signal Richtung Gehirn weiterleiten.
 Die Farbwahrnehmung beider lässt sich durch eine sogenannte Absorptionskurve beschreiben, welche angibt, welche Wellenlängen (Farben) am stärksten absorbiert, in elektrische Signale umgewandelt und somit wahrgenommen werden.
