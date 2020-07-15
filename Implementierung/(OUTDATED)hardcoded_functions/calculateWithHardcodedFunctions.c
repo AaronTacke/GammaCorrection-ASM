@@ -43,10 +43,11 @@ void calculateOptimized(uint8_t *arr, int width, int height, float gamma){
     void decode(uint8_t *result, int indexOfFunction){
         decodeFunction(compressedFunctionsSmall[indexOfFunction * 8], result);
     }
-    void main() {
-        uint8_t *result[256];
-        decode(result, 1);
+    int main() {
+        uint8_t result[256];
+        //decode(result, 1);
         for (int i = 0; i < 256; ++i) {
             printf("%d\n", result[i]);
         }
+        return 0;
     }

@@ -1,5 +1,10 @@
 .intel_syntax noprefix
 .global decodeFunction
+.global _decodeFunction
+
+_decodeFunction:
+call decodeFunction
+ret
 
 decodeFunction:
 //rdi compressedFUnction pointer
