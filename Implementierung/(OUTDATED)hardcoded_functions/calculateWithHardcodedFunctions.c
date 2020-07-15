@@ -1,8 +1,9 @@
 #include <stdint.h>
 #include <stdio.h>
-//#include "GammaFunctions.h"
-//#include "GammaValues.h"
-#include "encodedFunctionsSmall.h"
+#include <math.h>
+#include "GammaFunctions.h"
+#include "GammaValues.h"
+#include "encodedFunctions.h"
 
 extern void decodeFunction(long long *compressedFunction, uint8_t *result);
 /*
@@ -40,14 +41,20 @@ void calculateOptimized(uint8_t *arr, int width, int height, float gamma){
         *(arr+i+2) = (uint8_t) p;
     }
     */
-    void decode(uint8_t *result, int indexOfFunction){
-        decodeFunction(compressedFunctionsSmall[indexOfFunction * 8], result);
-    }
-    int main() {
-        uint8_t result[256];
-        //decode(result, 1);
-        for (int i = 0; i < 256; ++i) {
-            printf("%d\n", result[i]);
+void decode(uint8_t *result, int indexOfFunction){
+    decodeFunction((compressedFunctions + indexOfFunction * 8), result);
+}
+int main() {
+    uint8_t result[256];
+    for (int j = 1; j < sizeof(gammaValues) / sizeof(float); ++j) {
+        printf("j:%d\n", j);
+        decode(result, j);
+        for (int i = 0; i < 255; ++i) {
+            uint8_t correct = gammaFunctions[j*256+i];
+            if(result[i] != correct) {
+                printf("Error, expected:%d, but was %d\n", correct, result[i]);
+            }
         }
-        return 0;
     }
+    return 0;
+}
