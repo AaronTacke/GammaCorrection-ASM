@@ -22,6 +22,7 @@ calculate_asm:
 //logArray rcx
 //gammaArray r10
 
+//We need Gamma as a double value to calculate more precesily with the log values
 CVTPS2PD xmm0, xmm0
 lea rcx, [rip + logValues]
 lea r10, [rip + result]
@@ -36,6 +37,7 @@ movsd xmm1, [rcx]
 movsd xmm2, [rcx]
 mulsd xmm2, xmm0
 
+//Calculate Function for Gammacorrection:
 endLoop:
 whileLoop:
 cmp r9, 254
@@ -60,6 +62,7 @@ endWhileLoop:
 mov byte ptr [r10 + 255], 255
 //FUNCITON NOW IS STARTING AT R10
 
+//Calculate size of array:
 //width * height
 imul rsi, rdx
 //pixels * 3 * 6/5 (the /5 part is calculated using a magic number)
@@ -80,18 +83,19 @@ add rsi, rdi
 //rdi will be used as a counter, so this is not redundant.
 mov rax, rdi
 
+//Create ByteMasks to use SIMD for Grayscale calculation:
+
 //ByteMask to Shift result bytes all over xmm register:
-pxor xmm14, xmm14
-mov rcx, 0x0001010102020203
+//0xff 000000 010101 020202 030303 040404
+mov rcx, 0xff00000001010102
 movq xmm14, rcx
 PSLLDQ xmm14, 8
-mov rcx, 0x0303040404050505
+mov rcx, 0x0202030303040404
 movq xmm15, rcx
 por xmm14, xmm15
 
 //Prepare Byte-Mask for a-PSHUFB
 //0xffff0fff ff0cff09 ffffff06 ffff03ff
-pxor xmm8, xmm8
 mov rcx, 0xffff0cffff09ff06
 movq xmm8, rcx
 PSLLDQ xmm8, 8
@@ -100,7 +104,6 @@ movq xmm15, rcx
 por xmm8, xmm15
 //Prepare Byte-Mask for b-PSHUFB
 //0xffff0eff ff0bff08 ffffff05 ffff02ff
-pxor xmm9, xmm9
 mov rcx, 0xffff0dffff0aff07
 movq xmm9, rcx
 PSLLDQ xmm9, 8
@@ -109,7 +112,6 @@ movq xmm15, rcx
 por xmm9, xmm15
 //Prepare Byte-Mask for c-PSHUFB
 //0xffff0dff ff0aff07 ffffff04 ffff01ff
-pxor xmm10, xmm10
 mov rcx, 0xffff0effff0bff08
 movq xmm10, rcx
 PSLLDQ xmm10, 8
@@ -117,37 +119,26 @@ mov rcx, 0xffffff05ffff02ff
 movq xmm15, rcx
 por xmm10, xmm15
 
-//Prepare Byte-Mask for Result PSHUFB
-//0x0e0e0e 0b0b0b 090909 050505 020202 ff
-pxor xmm7, xmm7
-mov rcx, 0xff0e0e0e0b0b0b09
-movq xmm7, rcx
-PSLLDQ xmm7, 8
-mov rcx, 0x0909050505020202
-movq xmm15, rcx
-por xmm7, xmm15
-
 //Prepare Byte-Mask for a-multiplicatoin (a=77=0x4D)
-pxor xmm11, xmm11
 mov rcx, 0x4D0000004D
 movq xmm11, rcx
 PSLLDQ xmm11, 8
 movq xmm15, rcx
 por xmm11, xmm15
 //Prepare Byte-Mask for b-multiplicatoin (b=151=0x97)
-pxor xmm12, xmm12
 mov rcx, 0x9700000097 //Doubled because we may change b value
 movq xmm12, rcx
 PSLLDQ xmm12, 8
 movq xmm15, rcx
 por xmm12, xmm15
 //Prepare Byte-Mask for c-multiplicatoin (a=28=0x1C)
-pxor xmm13, xmm13
 mov rcx, 0x1C0000001C
 movq xmm13, rcx
 PSLLDQ xmm13, 8
 movq xmm15, rcx
 por xmm13, xmm15
+
+//Go through pixelArray calculating 5 Pixels at a time:
 
 1://Begin of loop
 cmp rsi, rdi
@@ -171,58 +162,51 @@ PMULLD xmm3, xmm13
 PADDD xmm3, xmm2
 PADDD xmm3, xmm1
 
-//Move results to all Bytes in xmm Register
-PSHUFB xmm3, xmm7 //TODO dieses kann ich sparen.
-
-
 xor rdx, rdx
+xor r9, r9
 //PIXEL 1:
+PSRLDQ xmm3, 2
+//Get Grayscale value:
 movd r8d, xmm3
 and r8, 0x00000000000000ff
-mov r9, [r10+r8]
-and r9, 0x00000000000000ff
+//Look up result in pre-calculated function
+mov r9b, [r10+r8]
+//Save result in rdx register
 mov rdx, r9
-//PIXEL 2:
+//PIXEL 2 (same as PIXEL 1):
 PSRLDQ xmm3, 3
 movd r8d, xmm3
 and r8, 0x00000000000000ff
-mov r9, [r10+r8]
-and r9, 0x00000000000000ff
+mov r9b, [r10+r8]
 SHL rdx, 8
 or rdx, r9
-//PIXEL 3:
+//PIXEL 3 (same as PIXEL 1):
+PSRLDQ xmm3, 4
+movd r8d, xmm3
+and r8, 0x00000000000000ff
+mov r9b, [r10+r8]
+SHL rdx, 8
+or rdx, r9
+//PIXEL 4 (same as PIXEL 1):
+PSRLDQ xmm3, 2
+movd r8d, xmm3
+and r8, 0x00000000000000ff
+mov r9b, [r10+r8]
+SHL rdx, 8
+or rdx, r9
+//PIXEL 5 (same as PIXEL 1):
 PSRLDQ xmm3, 3
 movd r8d, xmm3
 and r8, 0x00000000000000ff
-mov r9, [r10+r8]
-and r9, 0x00000000000000ff
+mov r9b, [r10+r8]
 SHL rdx, 8
 or rdx, r9
-//PIXEL 4:
-PSRLDQ xmm3, 3
-movd r8d, xmm3
-and r8, 0x00000000000000ff
-mov r9, [r10+r8]
-and r9, 0x00000000000000ff
-SHL rdx, 8
-or rdx, r9
-//PIXEL 5:
-PSRLDQ xmm3, 3
-movd r8d, xmm3
-and r8, 0x00000000000000ff
-mov r9, [r10+r8]
-and r9, 0x00000000000000ff
-SHL rdx, 8
-or rdx, r9
-//Save last byte:
-PSRLDQ xmm3, 3
-movd r9, xmm3
-SHL rdx, 8
-or rdx,r9
+
+//Move gammacorrected values back to xmm register:
 movq xmm3, rdx
 PSHUFB xmm3, xmm14
 
-//Move result to memory
+//Copy result to memory
 movdqa [rdi], xmm3
 
 add rdi, 16
