@@ -95,7 +95,7 @@ movq xmm15, rcx
 por xmm14, xmm15
 
 //Prepare Byte-Mask for a-PSHUFB
-//0xffff0fff ff0cff09 ffffff06 ffff03ff
+//0xffff0cffff09ff06 ffffff03ffff00ff
 mov rcx, 0xffff0cffff09ff06
 movq xmm8, rcx
 PSLLDQ xmm8, 8
@@ -103,7 +103,7 @@ mov rcx, 0xffffff03ffff00ff
 movq xmm15, rcx
 por xmm8, xmm15
 //Prepare Byte-Mask for b-PSHUFB
-//0xffff0eff ff0bff08 ffffff05 ffff02ff
+//0xffff0dffff0aff07 ffffff04ffff01ff
 mov rcx, 0xffff0dffff0aff07
 movq xmm9, rcx
 PSLLDQ xmm9, 8
@@ -111,7 +111,7 @@ mov rcx, 0xffffff04ffff01ff
 movq xmm15, rcx
 por xmm9, xmm15
 //Prepare Byte-Mask for c-PSHUFB
-//0xffff0dff ff0aff07 ffffff04 ffff01ff
+//0xffff0effff0bff08 ffffff05ffff02ff
 mov rcx, 0xffff0effff0bff08
 movq xmm10, rcx
 PSLLDQ xmm10, 8
