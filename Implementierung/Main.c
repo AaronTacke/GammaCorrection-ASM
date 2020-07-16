@@ -11,21 +11,21 @@ extern uint8_t* calculate_asm(uint8_t* picture, int width, int height, float gam
 
 //Shows how to use the program and stops it.
 void printUsageAndExit(char *name){
-    printf("This is %s.\nThe fast grayscale-filter with gamma correction for PPM-files.\n\n", name);
+    printf("\nThis is %s.\nThe fast grayscale-filter with gamma correction for PPM-files.\n\n", name);
 
     printf("Usage:\n%s [-i inputPath] [-g gamma] [-o outputPath] [-b iterations] [-t] [-h]\n\n", name);
-
-    printf("Normal image processing:\n");
-    printf("-i inputPath:\tpath of image (Required!)\n");
-    printf("-g gamma:\tvalue for gamma > 0 (Required!)\n");
-    printf("-o outputPath:\tpath of result image (Optional)\n");
-    printf("\t\tStandard: ./GammaResult.ppm\n\n");
 
     printf("Operating modes:\n");
     printf("[]\t\tnormal image processing\n");
     printf("-h:\t\tprint this help page\n");
     printf("-t:\t\ttest optimized implementation\n\t\t(not allowed with -b)\n");
     printf("-b iterations:\tbenchmark implementation \n\t\t(not allowed with -t or -o)\n\n");
+
+    printf("Normal image processing:\n");
+    printf("-i inputPath:\tpath of image (Required!)\n");
+    printf("-g gamma:\tvalue for gamma > 0 (Required!)\n");
+    printf("-o outputPath:\tpath of result image (Optional)\n");
+    printf("\t\tStandard: ./GammaResult.ppm\n\n");
 
     printf("Test opitimized implementation (-t):\n");
     printf("-i inputPath:\ttest image path (Optional)\n");
