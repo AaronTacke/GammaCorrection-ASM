@@ -91,9 +91,15 @@ int main(int argc, char *argv[]){
             printUsageAndExit(name);
         }
         //Print diagram if no gamma is set.
-        if (gamma <= 0){
+        if (gamma <= 0 && inputPath[0] == '\0') {
+            //Only if no gamma and no input path is specified.
             showDiagramData(0,benchmarkIterations);
             exit(EXIT_SUCCESS);
+        }
+
+        if(gamma<=0){
+            //If gamma not specified but input path specified set gamma to 1.
+            gamma = 1;
         }
 
         uint8_t* arr1;
@@ -103,12 +109,10 @@ int main(int argc, char *argv[]){
             arr1 = readPicture(inputPath);
             arr2 = alignArray(arr1);
         }else{
-            //test with standard image
-            //TODO Benchmark with big random array, not little test array.
-            arr1 = getTestArray();
+            //test with random 4096x4096 image
+            arr1 = getSquareImage(0, 4096);
             arr2 = alignArray(arr1);
         }
-        //test with standard image
 
         double time = calculateTime(arr2, width, height, gamma, benchmarkIterations) / benchmarkIterations;
         double compareTime = calculateCompareTime(arr1, width, height, gamma, benchmarkIterations) / benchmarkIterations;

@@ -260,8 +260,10 @@ void showDiagramData(int useGrayscale, int iterations){
             cTime += calculateCompareTime(copyArray,width,height,g, iterations);
             free(copyArray);
             copyArray = alignArray(originalArray);
+            //copyArray = copyTestArray(originalArray); //Use this if benchmarking an old version without Aligned commands
             asmTime += calculateTime(copyArray,width,height,g,iterations);
             aligned_free(copyArray);
+            //free(copyArray); //Use this if benchmarking an old version without Aligned commands
         }
         //Calculate time per 1 calculation
         cTime = cTime/(iterations*8);

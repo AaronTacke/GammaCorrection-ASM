@@ -19,4 +19,5 @@ double calculateTime(uint8_t *arr, int width, int height, float gamma, int itera
 double calculateCompareTime(uint8_t *arr, int width, int height, float gamma, int iterations);
 uint8_t *getTestArray();
 void showDiagramData(int useGrayscale, int iterations);
+uint8_t *getSquareImage(int useGrayscale, int size);
 #endif //TEAM141_TEST_H
