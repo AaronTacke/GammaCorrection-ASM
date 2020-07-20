@@ -2,7 +2,7 @@
 \documentclass[course=erap]{aspdoc}
 \usepackage{wrapfig}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% TODO: Ersetzen Sie in den folgenden Zeilen die entsprechenden -Texte-
 %% mit den richtigen Werten.
 \newcommand{\theGroup}{141} % Beispiel: 42
@@ -16,21 +16,20 @@
 
 \begin{document}
 	\maketitle
-	
+
 	\section{Einleitung}
-	\subsection{Einsatz und Funktionsweise der Gammakorrektur}
-	
+
 	\begin{wrapfigure}{r}{0.35\linewidth}
-		\includegraphics[width=5cm]{gammaBeispiel.jpg}
+		\includegraphics[width=5cm]{Images/gammaBeispiel.jpg}
 	\end{wrapfigure}
-	Selbst über 100 Jahre nach der Entwicklung der Farbfotografie, erfreuen sich Schwarzweißbilder hoher Beliebtheit. Denn ohne störenden Farben lenken sie den Blick des Betrachters gezielt auf das Wesentliche und heben den Kontrast und die graphische Struktur der aufgenommenen Szenerie exzellent hervor.\\
-	Um möglichst realistische Schwarzweißbilder zu erzeugen, unterzieht man diese einer Gammakorrektur, bei der gezielt Einfluss auf die Helligkeit der einzelnen Pixel genommen wird.\\
-	
-	\noindent Möchte man mit heutigen Kameras digitale Schwarzweißaufnahmen machen, gelingt dies meist nur durch Umwandlung eines digitalen Farbbildes. Um von dieser höheren Auflösung moderner Kameras zu profitieren, benötigen wir ein Programm, welches eine große Anzahl an Pixeln mit sinnvoll spezifizierten Gewichtungen der Farben performant in Graustufen umwandelt, und eine effiziente Gammakorrektur anwendet.\\
-	
-	\noindent Als Eingabe soll deshalb jedes ASCII-Kodierte Bild im PPM-Format und eine vom Benutzer gewählte positive Fließkommazahl für die Gammakorrektur fungieren. Dabei soll für jeden Gamma-Wert der mathematisch korrekt berechnete Pixelwert bestimmt und das umgewandelte Bild im PPM-Format abgespeichert werden.
-	
-	
+	Selbst über 100 Jahre nach der Entwicklung der Farbfotografie, erfreuen sich Schwarzweißbilder hoher Beliebtheit. Denn ohne störende Farben lenken sie den Blick des Betrachters gezielt auf das Wesentliche und heben den Kontrast und die graphische Struktur der aufgenommenen Szenerie exzellent hervor.\\
+	Um möglichst realistische Schwarzweißbilder zu erzeugen, unterzieht man diese einer Gammakorrektur, bei der die Helligkeit der Pixel beeinflusst wird.\\
+
+	\noindent Möchte man mit heutigen Kameras digitale Schwarzweißaufnahmen machen, gelingt dies meist nur durch Umwandlung eines digitalen Farbbildes. Um von der höheren Auflösung moderner Kameras zu profitieren, benötigen wir ein Programm, welches eine große Anzahl an Pixeln mit sinnvoll spezifizierten Gewichtungen der Farben performant in Graustufen umwandelt und eine effiziente Gammakorrektur anwendet.\\
+
+	\noindent Als Eingabe soll jedes ASCII-Kodierte Bild im PPM-Format und eine vom Benutzer gewählte positive Fließkommazahl für die Gammakorrektur fungieren. Dabei soll für jeden $\gamma$-Wert der mathematisch korrekt berechnete Pixelwert als Ganzzahl bestimmt und das umgewandelte Bild im PPM-Format abgespeichert werden.
+
+
 	\section{Lösungsansatz}
 	\subsection{PPM-Format}
 	Die erste Zeile eines PPM-Bildes kennzeichnet das PPM-Format. Da wir mit Bildern, welche in ASCII gespeichert sind, arbeiten, erwarten wir hier "P3".
@@ -38,97 +37,115 @@
 	In der dritten Zeile werden Breite und Höhe des Bildes, durch ein Leerzeichen getrennt, angegeben.
     Die vierte Zeile enthält den maximalen Wert eines Farbanteils. Jede folgende Zahl liegt also zwischen Null und dem hier spezifizierten Wert, welcher bei uns standardmäßig 255 sein muss.
     Danach folgen für jedes Pixel drei Zeilen, welche die Rot-, Grün- und Blau-Werte für das jeweilige Pixel beinhalten.
-	
+
 	\subsection{Berechnung des Graustufenfilters}
-	Zu Beginn wird jedes Pixel in Graustufen umgewandelt. Dabei berechnet sich der neue Wert eines Pixels mit folgender Formel.
+	Zu Beginn wird jedes Pixel in Graustufen umgewandelt. Dabei berechnen sich die neuen Werte eines Pixels mit folgender Formel.
 	\begin{equation}
 	\label{(1)}
 	p_{alt} =  \begin{pmatrix}R \\\ G \\\ B \end{pmatrix} \qquad D = \frac{a \cdot R  + b \cdot G  + c \cdot B }{a + b + c} \qquad p_{neu} =  \begin{pmatrix}D \\\ D \\\ D \end{pmatrix}
-	\end{equation}	
-	% TODO: Birgt den vorteil, dass wir nicht divideren müssen
+	\end{equation}
+
 	Wir entschieden uns dafür, dass für die Gewichtung \begin{equation}
 	a + b + c = 256
 	\end{equation} gelten soll. Dies birgt den Vorteil, dass für die weitere Berechnung die Division durch einen Shiftbefehl effizient berechnet werden kann.
-	
+
 	\subsection{Optimierung des Graustufenfilters mit SIMD}
 	Die Grundidee für die optimierte Berechnung mit SIMD ist es, mit Hilfe von drei XMM-Registern den Graustufenfilter auf fünf Pixel gleichzeitig anzuwenden. Hierfür werden jeweils der Rot-, Grün- und Blauanteil der Pixel in einem XMM-Register gespeichert, sodass sich vor jeder belegten Speicherzelle noch mindestens ein freies Byte befindet. Dann werden die XMM-Register jeweils mit zugehörigem Faktor ($a,b$ oder $c$) multipliziert. Im nächsten Schritt werden die XMM-Register aufaddiert und mit einer entsprechenden Bytemaske die niederwertigen Bytes der Ergebnisse extrahiert. Eine explizite Division ist dabei nicht notwendig, da $a,b$ und $c$ in Summe $256$ ergeben und die Maskierung der höherwertigen Bytes einer Division mit 256 entspricht.
-	\\
-	\newline
+    \begin{figure}[H]
+			\centering
+			\includegraphics[scale=0.46]{Images/SIMDoptimization.png}
+			\caption{SIMD Optimierung}
+			\label{SimdOptimization}
+	\end{figure}
 	\noindent
-	Dabei stellten wir fest, dass die mit SIMD optimierte Ausführung weniger effizient verlief, als die Vergleichsimplementierung in C. Der Grund hierfür war, dass die Pixel nicht in 16 Byte Blöcken aligned waren und daher die Shiftbefehle für die richtige Anordnung der Pixelwerte in den xmm-Registern ca. $35\%$ der gesamten Berechnungsdauer benötigten. Aus diesem Grund sorgten wir für ein Alignment des Speichers, indem wir nach jedem 15. Byte ein 0 Byte einfügten und die Assemblerimplementierung dementsprechend abänderten. Dabei ließen sich zudem ein paar Shiftbefehle einsparen und es gelang uns, mit der SIMD optimierten Version die Laufzeit um $x?????\%$ %TODO Aaron wir wissen nicht genau um wie viel es schneller geworden ist
-	gegenüber des in C implementierten Graustufenfilters zu verbessern.  
-	
-	
-	\subsection{Untersuchung der Gammafunktion}
-	Unsere oberste Priorität war es, für alle positiven Gammawerte, die mit dem Datentyp float darstellbar sind, die Gammakorrektur durchführen zu können.
+	Dabei stellten wir fest, dass die mit SIMD optimierte Ausführung weniger effizient verlief als die Vergleichsimplementierung in C. Der Grund hierfür war, dass die Pixel nicht in 16 Byte Blöcken aligned waren, was die Speicherzugriffe sehr teuer gemacht hat.
+	Außerdem benötigten wir deshalb (beispielsweise zum Speichern des überflüssigen 16. Wertes) zu viele Shift-Befehle, welche ca. $35\%$ der gesamten Berechnungsdauer in Anspruch nahmen. Aus diesem Grund sorgten wir für ein Alignment des Speichers, indem wir nach jedem 15. Byte ein 0 Byte einfügten und die Assemblerimplementierung dementsprechend abänderten. Dabei gelang es uns, mit der SIMD optimierten Version die Laufzeit (auf einem 2000x2000-Pixel Bild) um $66\%$ gegenüber des in C implementierten Graustufenfilters zu verbessern.
+
+
+	\subsection{Untersuchung der Gammakorrektur}
+	Unsere oberste Priorität war es, für alle positiven Werte für $\gamma$, die mit dem Datentyp float darstellbar sind, die mathematisch korrekte Gammakorrektur durchführen zu können.
+
 	\begin{equation}
 	p_{neu} = \left(\frac{p_{alt}}{255}\right)^{\gamma} \cdot 255
-	\end{equation}   
-	Da es sich bei $\gamma$ um eine Gleitkommazahl handelt und die Potenzierung von dieser, der Potenz einer nten Wurzel entspricht, ist für diese Berechnung ein effizientes Approximieren von Wurzeln erforderlich. Vor allem das Berechnen der n-ten Wurzel stellte sich als Problem heraus, weil hierfür eine Vielzahl an mathematischen Operationen ausgeführt werden müssen. Aus diesem Grund untersuchten wir die Gammafunktion hinsichtlich ihres Wertebereichs und Monotonieverhaltens, um ein effizienteres Verfahren zu entwickeln.
-	\newline
-	
+	\end{equation}
+	Diese Funktion nennen wir im Folgenden Gammafunktion.\\
+
+	\noindent Da es sich bei der Potenz mit $\gamma$ um eine Gleitkommazahl im Exponenten handelt, ist der naive Lösungsansatz, $\gamma$ mit einem Bruch zu approximieren und die Potenz durch eine ganzzahlige Potenz und das Ziehen einer n-ten Wurzel zu ersetzen.
+	Vor allem das Berechnen der n-ten Wurzel stellte sich allerdings als Problem heraus, weil hierfür eine Vielzahl an mathematischen Operationen ausgeführt werden müssen. Deshalb nutzen wir den eingeschränkten Definitions- und Wertebereich $\{0,...,255\}$ und den Fakt, dass die Funktion monoton steigt für weitere Optimierungen.
+
 	\subsection{Berechnung aller Gammafunktionen}
-	Die zwei Erkenntnisse über die endliche Anzahl an unterschiedlichen Gammafunktionen und über das Monotonieverhalten nutzen wir, um mit Hilfe eines C-Programms Intervalle für $\gamma$ zu berechnen, in denen die jeweiligen Gammafunktionen für jeden Eingabewert von $0-255$ die gleiche Ausgabe liefern. Hierfür verwendeten wir Bisektion, indem mit zwei aufeinander folgenden float Werten gestartet und die Größe des Intervalls zunächst so lange verdoppelt wird, bis sich die Funktionswerte an den Intervallgrenzen unterscheiden. Von diesem neuen Intervall wird die Mitte und der Funktionswert an der mittleren Stelle berechnet. Ist dieser neue Wert gleich dem Funktionswert der rechten Intervallgrenze, wird das linke Intervall weiter verkleinert, wenn nicht wird das rechte verkleinert. Dies wird solange fortgeführt, bis die Stelle gefunden wurde, an der sich für zwei aufeinander folgende float Werte die Funktionswerte unterscheiden. Nach Ausführung des Programms speicherten wir die 64484 resultierenden Werte in einer Headerdatei ab, um bei späteren Tests über einfachen Zugriff zu verfügen.
-	
+	Die Erkenntnisse über den geringen Definitions- und Wertebereich unterschiedlicher Gammafunktionen und über das Monotonieverhalten nutzen wir, um mit Hilfe eines C-Programms Intervalle für $\gamma$ zu berechnen, in denen die entsprechenden Gammafunktionen für jeden Eingabewert von $0-255$ die gleiche Ausgabe liefern. Hierfür verwendeten wir Bisektion, indem mit zwei aufeinander folgenden float Werten gestartet und die Größe des Intervalls zunächst so lange nach rechts verdoppelt wird, bis sich die zugehörigen Funktionen an den Intervallgrenzen unterscheiden. Von diesem neuen Intervall wird die Mitte und die Funktion an der mittleren Stelle berechnet. Ist diese gleich der Funktion der rechten Intervallgrenze, wird der rechte Rand des Intervalls, andernfalls der Linke, auf die Mitte gesetzt. Dies wird solange fortgeführt, bis die Stelle gefunden wurde, an der sich für zwei aufeinander folgende float Werte die Funktionen unterscheiden. Nach Ausführung des Programms speicherten wir die 64484 resultierenden Werte in einer Headerdatei ab, um bei späteren Tests einfach darauf zugreifen zu können.
+
 	\subsection{Effiziente Speicherung von vorberechneten Gammafunktionen}
-	Mittels Binärer Suche implementierten wir einen Algorithmus, der es ermöglicht für ein gegebenes $\gamma$ die vorberechnenten Werte der Gammafunktion zu bestimmen.  Dabei stellte sich aber heraus, dass die Zeit für das Kompilieren der großen Headerdatei ca. 17 Sekunden in Anspruch nahm. Aus diesem Grund beschäftigten wir uns damit, wie eine effizientere Speicherung von Gammafunktionen aussehen könnte, um weniger Daten abspeichern zu müssen und die Compilezeit zu verkürzen.
+	Da uns eine Kompilierzeit von ca. 18 Sekunden und die Größe der ausführbaren Dateien mit ungefähr 17MB etwas viel ist, versuchten wir die vorberechneten Funktionen effizienter zu speichern.
 	\\
 	\newline
 	\noindent
-	Für die Optimierung des Speicherplatzes nutzten wir die Monotonieeigenschaft der Gammafunktion. Da diese monoton steigend ist, reicht es aus, abzuspeichern, um wie viel der nächste y-Wert größer ist als der vorherige. Dies bedeutet, dass sich jede Gammafunktion unär repräsentieren lässt, indem die Anzahl der Nullen vor der nten Eins den nten Funktionswert liefern. Abbildung \ref{KompremierungBeispiel} zeigt ein Beispiel für die ersten sechs Werte einer Gammafunktion. 
-	
+	Da die Gammafunktion monoton steigend ist und stets $f(0)=0$ gilt, reicht es aus abzuspeichern, um wie viel der nächste y-Wert größer ist als der Vorherige. Dies bedeutet, dass sich jede Gammafunktion unär repräsentieren lässt, indem die Gesamtanzahl der Nullen vor der n-ten Eins den n-ten Funktionswert liefern. Abbildung \ref{KompremierungBeispiel} zeigt ein Beispiel für die ersten sechs Werte einer Gammafunktion, welche als Binärzahl $001100101001001_{2}$ oder dezimal mit $6473_{10}$ beschrieben werden kann.
+
 	\noindent
 	\begin{wrapfigure}{r}{0cm}
-        \includegraphics[width=9cm]{Images/CompressionOfFunctions.png}
-         \caption{Bildunterschrift}
+        \includegraphics[width=6cm]{Images/CompressionOfFunctions.png}
+         \caption{Beispielkodierung}
          \label{KompremierungBeispiel}
     \end{wrapfigure}
-	Da die Gammafunktionen jeweils nur 256 Funktionswerten aus dem Wertebereich zwischen $0$ und $255$ besitzen, benötigt man 256 Einsen und 256 Nullen, um eine Gammafunktion abzuspeichern. Dies bedeutet, dass sich mit 64 Byte, also mit vier Zahlen des Datentypes $\_\_int128$, eine Gammafunktion abspeichern lässt. Da wir aber keine einfach Möglichkeit fanden, Zahlen des Datentyps $\_\_int128$ in einen String zu konvertieren und sich zudem das Dekodieren mit Xmm-Registern als schwierig erwies, speicherten wir die kodierte Funktion mit acht Dezimalzahlen des Datentypes $long$ $long$ ab. Mit diesem Verfahren gelang es uns, den Speicherverbrauch von 70MB Bytes auf ein siebtel zu reduzieren und die Compilezeit von zuvor 17 Sekunden auf zwei Sekunden zu senken. 
-	Abbildung \ref{KompremierungBeispiel} zeigt anhand einer Beispielfunktion das Kompressionsverfahren. Diese Funktion würde mit $001100101001001_{2}$ als Binärzahl oder mit $6473_{10}$ im Dezimalsystem repräsentiert. 
+	Da die Gammafunktionen jeweils nur 256 Funktionswerten aus dem Wertebereich zwischen $0$ und $255$ besitzen, benötigt man 256 Einsen und 256 Nullen, um eine Gammafunktion abzuspeichern. Wir speicherten die kodierte Funktion mit acht Dezimalzahlen des Datentypes $long$ $long$ ab. Somit gelang es uns, den Speicherverbrauch von 70MB auf ein siebtel zu reduzieren und die Compilezeit von zuvor 18 Sekunden auf zwei Sekunden zu senken.
 
 	\subsection{Dekodierung der Komprimierten Funktionen}
-	Für das Dekodieren einer so komprimierten Funktion werden für den jeweils vom Benutzer spezifizierten Gammawert die acht zugehörigen Werte aus dem Speicher der Reihe nach geladen und Bitweise nach links geshiftet. Nach jedem Shiftbefehl wird mit Hilfe des Carry-Flags überprüft, ob eine Null oder Eins aus dem Register geshiftet wurde und der jeweilige Zähler erhöht. Handelt es sich um eine Eins, bedeutet dies, dass der Funktionswert für x = Zähler der Einsen, der Anzahl der bisher gezählten Nullen entspricht. Dieser Wert wird abgespeichert und der Algorithmus solange wiederholt, bis die gesamten 512 Bit durchgeshiftet wurden. Mit diesem Verfahren werden für einen Gammawert die Funktionswerte aller möglichen $x\in{0,...,255}$ vorberechnet.
+	Für das Dekodieren einer so komprimierten Funktion werden für den gegebenen Gammawert die acht zugehörigen Werte aus dem Speicher der Reihe nach geladen und Bitweise nach links geshiftet. Nach jedem Shiftbefehl wird mit Hilfe des Carry-Flags überprüft, ob eine Null oder Eins aus dem Register geshiftet wurde und der jeweilige Zähler erhöht. Handelt es sich um eine Eins, bedeutet dies, dass der Funktionswert für x = Zähler der Einsen, der Anzahl der bisher gezählten Nullen entspricht. Dieser Wert wird abgespeichert und der Algorithmus solange wiederholt, bis die gesamten 512 Bit durchgeshiftet wurden. Mit diesem Verfahren werden für einen Gammawert die Funktionswerte aller möglichen $x\in{0,...,255}$ vorberechnet.\\
+	Effizientes Dekodieren während der Gammakorrektur könnte das Nutzen des Hauptspeichers überflüssig machen, und potenziell schneller sein als unsere Lösung, weshalb wir dies im Ausblick am Ende der Arbeit kurz aufgreifen.
 
 	\subsection{Berechnung der Wurzel}
-	Ein gängiges Verfahren um die für die Gammafunktion benötigte $\sqrt[n]{z}$ zu berechnen, ist es, diese als Nullstelle des Polynoms $f(x)=x^n-z$ auszudrücken und diese mit verschiedenen Verfahren zur Nullstellenapproximation wie zum Beispiel dem Newtonverfahren anzunähern. Weil aber selbst für das schnell konvergierende Newtonverfahren mehrmals verschiedene Funktionswerte von $f(x)$ berechnen werden müssen, stellte sich dieses Verfahren als nicht effizient genug heraus.     
-	
+	Das Berechnen einer Potenz mit nicht ganzzahligem Exponent ist schwierig, weshalb wir $\gamma$ als Bruch aus den natürlichen Zahlen $z$ und $n$ schreiben.\\
+
+	\noindent Ein gängiges Verfahren um nun $\sqrt[n]{\left(\frac{p_{alt}}{255}\right)^{z}}$ zu berechnen ist es, diese als Nullstelle des Polynoms
+	\begin{equation}
+	f(x) = {x}^{n} - \left(\frac{p_{alt}}{255}\right)^{z}
+	\end{equation}
+	 auszudrücken und diese mit verschiedenen Möglichkeiten zur Nullstellenapproximation, wie zum Beispiel dem Newtonverfahren, anzunähern. Weil aber selbst für das schnell konvergierende Newtonverfahren mehrmals verschiedene Funktionswerte von $f(x)$ berechnet werden müssen, ist diese Methode nicht effizient genug.
+
+	Für hohe Effizienz sollten $n$ und $z$ entsprechend klein sein, bei kleinem $n$ und $z$ lässt sich $\gamma$ allerdings nur ungenau beschreiben, weshalb wir nicht immer mathematisch korrekt berechnete Ergebnis erhalten.
+
 	\subsection{Binäre Suche zur Berechnung der Gammafunktion}
-	Um die Gammafunktion zu berechnen, wandelten wir  $\gamma$ in einen Bruch bestehend aus zwei Integern um. Ziel dieses Verfahrens war es wieder mit Hilfe von Binärer Suche den richtigen Wert der Gammafunktion zu bestimmen, indem %TODO Aaron
-	\\
-	\newline
-	\noindent	
-	Zur Berechnung der ganzzahligen Potenzen implementierten wir zudem eine Methode, die es ermöglicht mit Hilfe von Binärer Exponentiation die Anzahl, der für die Potenzierung erforderlichen Multiplikationen, auf ein Minimum zu reduzieren. 
-	\\
-	\newline
-	\noindent		 
-	Für einen Großteil der Werte von $\gamma$ erwies sich diese Verfahren als effizient. Aber die Genauigkeit des Bruchs für die Darstellung von $\gamma$ wies kleine Fehler auf, die sich durch das Potenzieren aufsummierten, sodass es bei manchen $\gamma$ Werten zu Fehlern bei der Berechnung. Da dies unserer Vorgabe der mathematischen Exaktheit unseres Programms widersprach, versuchten wir unser Verfahren weiter zu verbessern, indem wir auf den Exponten rechneten.          
-	
+	Da $p_{neu}$ ganzzahlig sein soll, und das Berechnen einer Wurzel relativ kompliziert ist, haben wir die Gammafunktion umgeformt zu:
+	\begin{equation}
+	p_{neu} = \max \{ x \in \mathbb{N}_{0} : \left(\frac{x}{255}\right)^{n} \leq \left(\frac{p_{alt}}{255}\right)^{z} \}
+	\end{equation}
+	\noindent
+	Zur Berechnung der ganzzahligen Potenzen implementierten wir zudem eine Methode, die es ermöglicht mit Hilfe von Binärer Exponentiation die Anzahl, der für die Potenzierung erforderlichen Multiplikationen, auf ein Minimum zu reduzieren.\\
+
+	\noindent
+	Für hohe Effizienz sollten $n$ und $z$ entsprechend klein sein, bei kleinem $n$ und $z$ lässt sich $\gamma$ allerdings nur ungenau beschreiben, weshalb wir nicht immer mathematisch korrekt berechnete Ergebnis erhalten. Da dies unserer Vorgabe der Exaktheit unseres Programms widersprach, versuchten wir unser Verfahren weiter zu verbessern, indem wir auf den Exponenten rechneten.
+
 	\subsection{Berechnung auf den Exponenten}
-	Um die Umwandlung von Dezimalzahlen in Brüche zu umgehen, formten wir mit Hilfe der Logarithmusgesetze die Gammafunktion um... %TODO Aaron
-	\begin{align}	
-	p_{neu} = \left(\frac{p_{alt}}{255}\right)^{\gamma} \cdot 255
-	\end{align}
-	\begin{align}	
-	\ln (p_{neu}) = \gamma \cdot \ln\left(\frac{p_{alt}}{255}\right) \cdot \ln(255)
-	\end{align}
-	\begin{align}
-	p_{neu} \cdot 255^\gamma = {p_{alt}}^{\gamma}
-	\end{align}
-	\begin{align}
-	\gamma \cdot \ln ( p_{neu} \cdot 255) = \gamma \cdot \ln({p_{alt}})
-	\end{align}
-	
+	Da wir wissen, dass $p_{alt}=0 \implies p_{neu}=0$ stets gilt, können wir die restliche Gammafunktion schreiben als:
+	\begin{equation}
+	    p_{neu} = \max\{x\in \mathbb{N} : l(x) \leq l(p_{alt}) \cdot \gamma\} \;\;\text{ mit } \;\; l(x) = \ln\left(\frac{x}{255}\right)
+	\end{equation}
+	Speichert man die Werte von $l(x)$ im Speicher, muss man nur noch den passenden Wert laden, mit $\gamma$ mulitplizieren, und mittels binärer Suche den zugehörigen x-Wert des nächstkleineren Funktionswertes von $l(x)$ bestimmen, welcher das gesuchte $p_{neu}$ ist.\\
+
+	\noindent
+	Da dieses Verfahren (auf einem 2000x2000-Pixel Bild) $58\%$ langsamer als die Vergleichsimplementierung war, mussten wir strukturell etwas an dem Programm ändern. Das Berechnen der Funktion am Anfang und das Speichern der 256 Funktionswerte im Hauptspeicher sollte dank des Caches eindeutig bessere Ergebnisse liefern.\\
+
+	\noindent
+	Um die gesamte Funktion noch effizienter zu berechnen, nutzten wir erneut das Monotonieverhalten, und bestimmten den deshalb stets positiven Wert $d$, welcher zwischen zwei Funktionswerten liegt.\\
+	Sei $g(x)$ hier die Gammafunktion, also $p_{neu}=g(x) \iff x = p_{alt}$
+	\begin{equation}
+	    d= |\{n\in \mathbb{N} : n>g(x-1) \;\wedge\; l(n)\leq l(x)\cdot \gamma\}|
+	\end{equation}
+	Als Algorithmus lässt sich diese Beobachtung folgendermaßen umsetzen: Man beobachtet die beiden Sequenzen, die sich aus $l(x)$ und $l(x)*\gamma$ im Definitionsbereich $\{1,...,255\}$ ergeben, führt für beide einen Zeiger $i_{l} = 0$ und $i_{\gamma} = 0$, sowie einen Zähler $c = 0$ ein.
+	Ist $l(i_{l})\leq l(i_{\gamma})*\gamma$, so erhöht man $i_{l}$ und $c$. Andernfalls speichert man $c$ als den Funktionswert von $i_{\gamma}+1$ ab.\\
+	Mit diesem Verfahren kann man die gesamte Funktion durch 510 Lesezugriffe und Vergleiche, sowie 255 Schreibzugriffe und Multiplikationen bestimmen.
+
 	\subsection{Vergleichsimplementierung}
 	Die Vergleichsimplementierung nutzt die Funktionen der C-Standardbibliothek, um die Pixel nacheinander mit den angegebenen mathematischen Funktionen zu berechnen. Trotz Kompilierung mit -O3 haben wir die Laufzeit dieser Implementierung so extrem unterboten, dass wir eine zweite Vergleichsimplementierung erstellten, welche auf die Funktionswerte aller möglicher zuvor berechneter Funktionen im Speicher zugreifen kann, und statt des langsamen Potenzierens lediglich die passende Funktion binär sucht. Wir konnten mit dieser Methode kein falsches Ergebnis feststellen, allerdings ist die vollständige Korrektheit mathematisch schwer zu beweisen.
-	%TODO Philip und ich denken wir haben doch den Beweis, weil für alle Gammafunktionen die Ergebnisse passen oder?
 	Zudem führten die vorberechneten Funktionen  zu langsamen Compilezeiten und großen ausführbaren Dateien, weshalb sie lediglich zum Benchmarking, nicht jedoch in der finalen Version des Programmes eingesetzt werden.
-	
+
 	\subsection{Intuitve Bestimmung des Graustufenfilters}
 	Die einfachste Form des Graustufenfilters, bei der nur der Durchschnitt der einzelnen Farbwerte mit Hilfe von \eqref{(1)} berechnet wird, nutzt $a=b=c=1$ als Parameter. Bei dieser einfachen Umwandlung wird jedoch fälschlicherweise angenommen, dass alle Farben vom menschlichen Auge gleich hell wahrgenommen werden. In der Realität unterscheidet sich die Farbwahrnehmung jedoch von dieser Vorstellung, da beispielsweise die Farbe grün heller wahrgenommen wird als blau. Um diese Informationen bei der Umwandlung in Graustufen nicht zu verlieren, müssen die Parameter a, b und c so angepasst werden, dass die Helligkeit in dem Graustufenbild der menschlichen Wahrnehmung der Farben auf dem ursprüglichen Bild entspricht.
 	\begin{figure}[h]
 		\begin{minipage}{0.49\linewidth}
 			\centering
-			%TODO funktioniert mit fruit_basket_original.png ganz normal, muss aber grey_standard sein
 			\includegraphics[scale=0.3]{Images/fruit_basket_grey_standard.png}
 			\caption{Ohne Gewichtung}
 		\end{minipage}
@@ -136,33 +153,34 @@
 		\centering
 		\begin{minipage}{0.49\linewidth}
 			\centering
-			%TODO funktioniert mit fruit_basket_original.png ganz normal, muss aber grey_improved sein
 			\includegraphics[scale=0.3]{Images/fruit_basket_grey_improved.png}
 			\caption{Mit Gewichtung}
 		\end{minipage}
-	\end{figure}
-	Im Vergleich der beiden Bilder ist zu erkennen, dass die Farben mit einer sinnvollen Gewichtung des Graustufenfilters viel realistischer in Graustufen umgewandelt werden. So sind die als heller wahrgenommenen Farben wie gelb oder grün auch in dem Graustufenbild deutlich heller dargestellt und lassen sich somit besser von den anders farbigen Objekten unterscheiden. In dem ersten Bild hingegen lässt sich kein eindeutiger Farbunterschied zwischen den einzelnen Früchten erkennen. Es ist somit deutlich, dass die Wahl der Paramter eine entscheidende Rolle für die realistische Umwandlung eines farbigen Bildes in Graustufen spielt. Wie ein möglichst idealer Wert, der nicht nur auf Intuition basiert, sondern an die menschliche Farbwahrnehmung angepasst ist, bestimmt werden kann, wird im Folgenden erläutert.
+	\end{figure}\\
+
+	\noindent Im Vergleich der beiden Bilder ist zu erkennen, dass die Farben mit einer sinnvollen Gewichtung des Graustufenfilters viel realistischer in Graustufen umgewandelt werden. So sind die als heller wahrgenommenen Farben wie gelb oder grün auch in dem Graustufenbild deutlich heller dargestellt und lassen sich somit besser von den anders farbigen Objekten unterscheiden. In dem ersten Bild hingegen lässt der Farbunterschied zwischen den einzelnen Früchten schlechter erkennen. Es ist somit deutlich, dass die Wahl der Paramter eine entscheidende Rolle für die realistische Umwandlung eines farbigen Bildes in Graustufen spielt. Wie ein möglichst idealer Wert, der nicht nur auf Intuition basiert, sondern an die menschliche Farbwahrnehmung angepasst ist, bestimmt werden kann, wird im Folgenden erläutert.
 	\subsection{Anpassung des Graustufenfilters auf das menschliche Auge}
 	Um den Einfall von Licht wahrzunehmen, befinden sich in der Retina des Auges sogenannte Stab- und Zapfenzellen, beide eine Art modfizierte Nervenzelle, welche Photonen (Licht) absorbieren können und ein entsprechendes elektrisches Signal Richtung Gehirn weiterleiten.
-	Die Farbwahrnehmung beider lässt sich durch eine sogenannte Absorptionskurve beschreiben, welche angibt, welche Wellenlängen (Farben) am stärksten absorbiert, in elektrische Signale umgewandelt und somit wahrgenommen werden.
-	Zapfenzellen erzeugen bei guter Beleuchtung scharfe Bilder, wohingegen Stabzellen für das Sehen bei geringem Licht und in peripheren Blickwinkeln verantwortlich sind. Somit müssen wir uns für die Wahl der Gewichtung von Farben für den Graustufenfilter lediglich an der Absorptionskurve von Zapfenzellen orientieren.
-	%TODO Wie kommt man auf die konkreten Zahlen??
+	Die Farbwahrnehmung dieser Zellen lässt sich durch eine sogenannte Absorptionskurve beschreiben, die angibt, welche Wellenlängen (Farben) am stärksten absorbiert, in elektrische Signale umgewandelt, und somit wahrgenommen werden.
+	Zapfenzellen erzeugen bei guter Beleuchtung scharfe Bilder, wohingegen Stabzellen für das Sehen bei geringem Licht und in peripheren Blickwinkeln verantwortlich sind. Somit müssen wir uns für die Wahl der Gewichtung von Farben für den Graustufenfilter lediglich an den Absorptionskurven von Zapfenzellen orientieren.\\
+	Verrechnet man die Anzahl der unterschiedlichen Zapfenzellen mit dessen Absorptionskurven erhält man die für unterschiedliche Wellenlängen (Farben) des Lichts die Intensitäten, mit der diese elektrische Signale im Gehirn auslösen, welche genau unseren Faktoren $a = 0,3$, $b = 0.59$ und $c = 0.11$ entsprechen.
+
 	\subsection{Resultate bei unterschiedlichen Gammawerten}
-	Die Empfindung von Helligkeit des menschlichen Auges ist logarithmisch und folgt wie viele anderen neurologische Prozesse dem Weber-Fechner-Gesetz \cite{weberFechnerGesetz}. In dunklen Bereichen steigt die Helligkeitssensitivität stärker an \cite{Logarithmische_Helligkeitswahrnehmung}. Durch die richtige Wahl von $\gamma$ können die Grauwerte eines Bildes gezielt so verändert werden, dass für das menschliche Auge realistischer wahrgenommen werden. 
-	\\
-	\newline
-	Ein weiterer Vorteil der Gammakorrektur besteht in der Aufhellung oder der Abdunklung von Fotos. So werden durch die Gammafunktion die dunkleren Pixel stärker aufgehellt als die die helleren Pixel. \cite{gammKorrekturWikipedia}
-	Dadurch bleibt das Helligkeitsspektrum erhalten und das Bild wirkt realistischer.
-	\\
-	\newline
-	Im Folgenden sind mehrere Bilder zu sehen auf die Gammakorrekturen mit unterschiedlichen Werten für $\gamma$ angewendet worden sind, um die Wirkung der Gammafunktion zu demonstrieren.  
-	
+	Die Empfindung von Helligkeit des menschlichen Auges folgt wie viele andere neurologische Prozesse dem Weber-Fechner-Gesetz \cite{weberFechnerGesetz} und ist somit logarithmisch. In dunklen Bereichen steigt die Helligkeitssensitivität stärker an \cite{Logarithmische_Helligkeitswahrnehmung}. Durch die richtige Wahl von $\gamma$ können die Grauwerte eines Bildes gezielt so verändert werden, dass sie für das menschliche Auge realistischer wahrgenommen werden. \\
+
+	\noindentAn den Abbildungen \ref{Obstkorb} bis \ref{ObstkorbGamma2} (siehe unten) ist zu erkennen, dass für $\gamma > 1$ die Bilder dunkler werden und sich in hellen Bereichen der Kontrast erhöht. Dieser Effekt lässt sich am besten verstehen, wenn man die zugehörigen Graphen der unterschiedlichen Gammafunktionen betrachtet. So verlaufen alle Graphen mit $\gamma > 1$  unter dem Graphen von $f(x)=x$. Dies bedeutet der Grauwert wird kleiner und das Bild wird dunkler dargestellt. Alle Funktionen mit $\gamma ' = \frac{1}{\gamma}$ stellen die Umkehrfunktion zur Funktion mit $\gamma$ dar und sind deshalb symmetrisch zur Winkelhalbierenden im ersten Quadranten. Daher verlaufen diese Funktionen oberhalb des Graphen von $f(x)$ und liefern größere Grauwerte und das bearbeitete Bild wird heller dargestellt. Wenn man für $\gamma$ den Wert $1,25$ wählt, erhält man ein Bild, dessen Kontrast bei diesem Beispiel am realistischsten wirkt (siehe Abbildung \ref{ObstkorbGamma1_25}).\\
+
+	\section{Korrektheit/Genauigkeit}
+
+	\subsection{Beispielanwendungen}
+	Abbildung \ref{Obstkorb} wurde von unserem Programm mit verschiedenen $\gamma$-Werten in ein Schwarzweißbild umgewandelt:
+
 	\begin{figure}[h]
 		\begin{minipage}{0.49\linewidth}
 			\centering
-			\includegraphics[scale=1.2]{Images/fruit_basket_gamma_1.png}
-			\caption{Ohne Gammakorrektur}
-			\label{ObstkorbGamma1}
+			\includegraphics[scale=1.2]{Images/fruit_basket_original.png}
+			\caption{Original}
+			\label{Obstkorb}
 		\end{minipage}
 		%\hfill
 		\centering
@@ -187,44 +205,62 @@
 			\caption{Korrektur mit $\gamma = 2.0,$}
 			\label{ObstkorbGamma2}
 		\end{minipage}
-	\end{figure}
-	
-	
-	\noindent
-	An den Bildern ist zu erkennen, dass für $\gamma > 1$ die Bilder dunkler werden und sich der Kontrast erhöht. Dieser Effekt lässt sich am besten verstehen, wenn man die zugehörigen Graphen der unterschiedlichen Gammafunktionen betrachtet. So verlaufen alle Graphen mit $\gamma < 1$  unter dem Graphen von $f(x)=x$. Dies bedeutet der Grauwert wird kleiner und das Bild wird dunkler dargestellt. Alle Funktionen mit $\gamma ' = \frac{1}{\gamma}$ stellen die Umkehrfunktion zur Funktion mit $\gamma$ dar und sind deshalb symmetrisch zur Winkelhalbierenden des ersten Quadranten. Daher verlaufen diese Funktionen oberhalb des Graphen von $f(x)$ und liefern größere Grauwerte und das bearbeitete Bild wird heller dargestellt. Wenn man für $\gamma$ den Wert $1,25$ wählt, erhält man ein Bild dessen Kontrast am realistischsten wirkt siehe Abbildung \ref{ObstkorbGamma1_25}.   
-	
-	\noindent
-	Zudem ist interessant, dass die Gammafunktion nicht jeden Grauwert gleich stark verändert. Abbildung \ref{imageDistance} zeigt um wie viel sich die Helligkeit eines Pixels durch die jeweilige Gammafunktion verändert. Da es sich hier um keinen konstanten Wert handelt, werden zu Beispiel für $\gamma = 0.5$ die dunklen Pixel stärker aufgehellt als die hellen, was zu einer natürlicheren Abbildung des umgewandelten Bildes führt.  
-	\newline
-	Der perfekte Wert für $\gamma$ lässt sich im Vorfeld nicht bestimmen, denn dieser ist abhängig von der Belichtung und dem Kontrast des aufgenommenen Fotos.
-	\begin{figure}[h]
-		\begin{minipage}{0.49\linewidth}
-			\centering
-			\includegraphics[scale=0.75]{Images/GammafunctionsDistanceToX.png}
-			\caption{Korrektur mit $\gamma = 0,5$}
-			\label{imageDistance}
-		\end{minipage}
-		%\hfill
-		\centering
-		\begin{minipage}{0.49\linewidth}
-			\centering
-			\includegraphics[scale=0.75]{Images/GammafunctionsPlotFor2And0,5.pn}
-			\caption{Korrektur mit $\gamma = 2.0,$}
-			\label{GammafunctionsPlot}
-		\end{minipage}
-	\end{figure}
-	\section{Korrektheit/Genauigkeit}
+	\end{figure}\\
+
 	\subsection{Berechnung aller möglichen Gammafunktionen}
-	Unsere oberste Priorität war es, für jedes positives $\gamma$ den korrekten Wert zu berechnen und so die Funktionalität nicht unnötig einzuschränken müssen. Auch kennen wir alle Gammafunktionen, die mit dem Datentyp float darstellbar sind und können daher für unser Programm garantieren, dass jeder $\gamma$ Wert korrekt berechnet wird. 
-	\\
-	Zudem verglichen wir alle Resultate der Assemblerimplementierungen mit äquivalenten C-Implementierungen, um sicherzugehen, dass die Optimierungen keine Fehler hervorriefen.  
-	\subsection{Robustheit des Programms}
-	Unser Programm prüft zudem, ob die übergebene ppm-Datei fehlerhaft ist und fängt falsche Parameter des Benutzers wie zum Beispiel negative $\gamma$ Werte oder nicht unterstütze Operationen ab. 
-	%TODO Philip
-		\section{Zusammenfassung und Ausblick}
-	
-	
-	% TODO: Fuegen Sie Ihre Quellen der Datei Ausarbeitung.bib hinzu
+	Unsere oberste Priorität war es, für jedes positive $\gamma$ den korrekten Wert zu berechnen und somit die Funktionalität nicht  einschränken zu müssen. Auch kennen wir alle Gammafunktionen, die mit dem Datentyp float darstellbar sind und können daher für unser Programm garantieren, dass jeder Wert für $\gamma$ korrekt berechnet wird.
+
+	\subsection{Test-Funktionalitäten}
+	Das Programm bietet die Möglichkeit, die optimierte Implementierung zu testen, indem entweder ein vorgegebenes oder selbst gewähltes Test-Bild umgewandelt wird, und danach das Ergebnis mit der Umwandlung der Vergleichsimplementierung Pixel für Pixel verglichen, und das Ergebnis auf der Konsole ausgegeben wird. Dafür kann der $\gamma$-Wert entweder frei gewählt werden, oder der Test wird für 10 Werte zwischen 0,2 und 2 durchgeführt.\\
+	Wir testeten unsere Implementierung auf einem Bild mit allen möglichen $2^{24}$ Pixeln, und unterschiedlichsten $\gamma$-Werten.
+
+	\section{Performanceanalyse}
+	\subsection{Systemdokumentation}
+	Getestet wurde auf einem System mit einem Intel Core i7-4650U Prozessor, 1.70 GHz, 8GB Arbeitsspeicher (1600 MHz DDR3), macOS Catalina 10.15.4, 64 Bit.
+    Kompiliert wurde mit GCC 4.2.1 mit der Option -O3.\\
+    Jeder ermittelte Wert wurde mit 30 Iterationen und 10 unterschiedlichen $\gamma$-Werten (soweit $\gamma$ nicht Teil des Diagramms war) berechnet. Die Wahl der Bildgrößen (200x200 bis 2000x2000 Pixel) lässt sich dadurch begründen, dass Bilder mit ähnlichen Anzahlen an Pixeln besonders häufig vorkommen.
+	\subsection{Analyse des Graustufenfilters}
+	\begin{wrapfigure}{r}{0.45\linewidth}
+		\includegraphics[width=7cm]{Images/Grayscale.png}
+	\end{wrapfigure}
+	Bei dem Vergleich der Geschwindigkeit der C-Implementierung mit einer einfachen SISD-implementierung in Assembler fällt auf, dass diese annähernd identisch sind. Die naheliegende Vermutung, dass die Disassemblierung der mit -O3 kompilierten C-Methode fast unserer SISD-Implementierung entspricht, bestätigt sich beim Vergleich der Befehle und Geschwindigkeiten, die das Programm ”Perf” ausgibt.
+	Der erste Versuch einer SIMD-Implementierung, welche die Graustufen-Werte von fünf Pixeln gleichzeitig berechnet, war trotz geringer Anzahl an Multiplikationen langsamer als die Vergleichsimplementierung. Dies lag an der Häufigkeit der 128-Bit Shift-Operationen, deren Kosten wir unterschätzt haben, und vor Allem dem nicht-ausgerichteten Zugriff auf den Speicher.
+	Durch Weglassen nicht notwendiger Shift-Befehle und 16-Byte Ausrichtung aller fünf aufeinander folgenden Pixel im Speicher, erreichten wir unabhängig von der Größe des Bildes eine deutlich besser Laufzeit als mit vorherigen Ansätzen und der Vergleichsimplementierungen.
+	\subsection{Analyse der Gammakorrektur}
+	\begin{wrapfigure}{r}{0.45\linewidth}
+		\includegraphics[width=7cm]{Images/Gammacorrection.png}
+	\end{wrapfigure}
+
+	Die Berechnung der Gammafunktion für jedes Pixel einzelnd ist trotz Bisektion mit logarithmischer Laufzeit langsamer als die Vergleichsimplementierung, weshalb es sinnvoll war, die 256 möglichen Funktionswerte vorher zu berechnen. \\
+	Dies war leider stets langsamer, als die binäre Suche, welche unter allen 64484 möglichen hardgecodeten Funktionen die richtige auswählt.
+	Da diese Menge an Funktionen allerdings Nachteile wie sehr lange Compile-Zeit (ca. 18 Sekunden) und große Binaries (ca. 17MB) mit sich zog, wäre sie ledglich in abgewandelter Form in Frage gekommen. Auf 512-Bit kodierte Funktionen hätten weniger Speicher verbraucht und könnten einmalig in Register geladen werden, weshalb es nicht mehr auf den Speicherzugriff als Flaschenhals ankäme, sondern lediglich die Effizienz der Dekodierung (siehe Ausblick).
+	\subsection{Analyse des fertigen Programms}
+	\begin{wrapfigure}{r}{0.45\linewidth}
+		\includegraphics[width=7cm]{Images/Both.png}
+	\end{wrapfigure}
+	An dieser Stelle ist der Vergleich mit der ursprünglichen Vergleichsimplementierung in C langweilig, weshalb wir versucht haben, die Laufzeit bei der Benutzung von hardgecodeten Funktionen zu unterbieten.
+	Da bei Ausführung des Graustufenfilters und der Gammafunktion zwischendurch kein passend ausgerichtetes Ergebnis benötigt wird, sondern die Ausgabe des Graustufenfilters unbearbeitet an die entsprechend angepasste Gammakorrektur gegeben werden kann, konnten weitere Shift-Operationen gespart werden.
+	Letztendlich genügt die Verbesserung durch den SIMD-Graustufenfilter, um in Verbindung mit ausgerichteten Speicherzugriffen die Laufzeit des C-Programmes, welche hardgecodete Funktionen für die Gammakorrektur verwendet, zu unterbieten.
+	\subsection{Performanz in Abhängigkeit von Gamma}
+	\begin{wrapfigure}{r}{0.45\linewidth}
+		\includegraphics[width=7cm]{Images/Gamma.png}
+	\end{wrapfigure}
+	Während die Vergleichsimplementierung durch eine längere Dauer der Berechnung der Potenz gerade bei häufig benutzten Werten von $\gamma$ zwischen 0 und 1 länger dauert, unterbietet unsere Implementierung die Laufzeit mit $\gamma$-unabhängiger Geschwindigkeit.
+	Dies ist dadurch begründet, dass die optimierte Berechnung der Gammafunktion stets die gleiche Anzahl an Befehlen ausführt, und lediglich triviale mathematische Funktionen (Multiplikation und Addition) verwendet werden, da wir auf den Exponenten rechnen.
+
+
+
+
+	\section{Zusammenfassung und Ausblick}
+	Unser Programm ermöglicht das effiziente Anwenden eines Graustufen-Filters mit Gammakorrektur auf beliebige Farbbilder im ASCII-Kodierten PPM-Format.\\
+	Das Ziel, dass unsere Optimierung für alle möglichen positiven $\gamma$-Werte die mathematisch korrekt berechneten Pixel liefert, gab uns zwar nicht die Möglichkeit Rundungen oder Abschätzungen zum Steigern der Performanz zu verwenden, zwung uns dafür allerdings, die unterschiedlichen Probleme mehrfach mit einer gewissen Kreativität neu anzugehen.\\
+	Schließlich gelang es uns unter Verwendung von SIMD-Befehlen, passendem Alignment, gerade genug Shift-Tricksereien und auf Assembler abgestimmte mathematische Formeln, einen Algorithmus zu implementieren, der (bei einem 2000x2000-Pixel Bild) zehn mal effizienter arbeitet, als eine naive Vergleichsimplementierung und sogar schneller vorgeht, als ein C-Programm, welches lediglich vorberechnete Funktionen aus dem Speicher ließt.\\
+
+	\noindent Einen Performanzvorteil gegenüber unserer Implementierung hätte lediglich ein Algorithmus, welcher eine Gammafunktion kodiert in Registern ablegt, da der Speicherzugriff der einzige Teil unserer Implementierung ist, welcher noch merklich verbessert werden kann.\\
+	Damit der Vorteil des Registers gegenüber dem Cache die Gesamtlaufzeit positiv beeinflusst, benötigte man eine Suche nach der Position des $x$-ten gesetzten Bits eines Registers.\\
+	Diese Funktionalität lässt sich zwar durch binäre Suche mit Shifts umsetzten, aber schneller als unser Programm ist sie nur, sobald ein Assembler-Befehl unterstützt würde, welcher diese Aufgabe effizient löst.
+
+	 % TODO: Fuegen Sie Ihre Quellen der Datei Ausarbeitung.bib hinzu
 	% Referenzieren Sie diese dann mit \cite{}.
 	% Beispiel: CR2 ist ein Register der x86-Architektur~\cite{intel2017man}.
 	\bibliographystyle{plain}
