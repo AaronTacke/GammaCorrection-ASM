@@ -115,7 +115,7 @@
 	Da $p_{neu}$ ganzzahlig sein soll, und das Berechnen einer Wurzel relativ kompliziert ist, haben wir die Gammafunktion umgeformt zu:
 	\begin{equation}
 	\label{(5)}
-	p_{neu} = \max \{ x \mathbb{N} :\left(\frac{x}{255}\right)^{n} \leq\left(\frac{p_{alt}}{255}\right)^{z} \}
+	p_{neu} = \max \{ x \in \mathbb{N} :\left(\frac{x}{255}\right)^{n} \leq\left(\frac{p_{alt}}{255}\right)^{z} \}
 	\end{equation}
 	\noindent	
 	Zur Berechnung der ganzzahligen Potenzen implementierten wir zudem eine Methode, die es ermöglicht mit Hilfe von Binärer Exponentiation die Anzahl, der für die Potenzierung erforderlichen Multiplikationen, auf ein Minimum zu reduzieren.\\
@@ -176,7 +176,7 @@
 	\subsection{Resultate bei unterschiedlichen Gammawerten}
 	Die Empfindung von Helligkeit des menschlichen Auges folgt wie viele andere neurologische Prozesse dem Weber-Fechner-Gesetz \cite{weberFechnerGesetz} und ist somit logarithmisch. In dunklen Bereichen steigt die Helligkeitssensitivität stärker an \cite{Logarithmische_Helligkeitswahrnehmung}. Durch die richtige Wahl von $\gamma$ können die Grauwerte eines Bildes gezielt so verändert werden, dass sie für das menschliche Auge realistischer wahrgenommen werden. \\
 
-	\noindentAn den Abbildungen \ref{Obstkorb} bis \ref{ObstkorbGamma2} (siehe unten) ist zu erkennen, dass für $\gamma > 1$ die Bilder dunkler werden und sich in hellen Bereichen der Kontrast erhöht. Dieser Effekt lässt sich am besten verstehen, wenn man die zugehörigen Graphen der unterschiedlichen Gammafunktionen betrachtet. So verlaufen alle Graphen mit $\gamma > 1$  unter dem Graphen von $f(x)=x$. Dies bedeutet der Grauwert wird kleiner und das Bild wird dunkler dargestellt. Alle Funktionen mit $\gamma ' = \frac{1}{\gamma}$ stellen die Umkehrfunktion zur Funktion mit $\gamma$ dar und sind deshalb symmetrisch zur Winkelhalbierenden im ersten Quadranten. Daher verlaufen diese Funktionen oberhalb des Graphen von $f(x)$ und liefern größere Grauwerte und das bearbeitete Bild wird heller dargestellt. Wenn man für $\gamma$ den Wert $1,25$ wählt, erhält man ein Bild, dessen Kontrast bei diesem Beispiel am realistischsten wirkt (siehe Abbildung \ref{ObstkorbGamma1_25}).\\  
+	\noindent An den Abbildungen \ref{Obstkorb} bis \ref{ObstkorbGamma2} (siehe unten) ist zu erkennen, dass für $\gamma > 1$ die Bilder dunkler werden und sich in hellen Bereichen der Kontrast erhöht. Dieser Effekt lässt sich am besten verstehen, wenn man die zugehörigen Graphen der unterschiedlichen Gammafunktionen betrachtet. So verlaufen alle Graphen mit $\gamma > 1$  unter dem Graphen von $f(x)=x$. Dies bedeutet der Grauwert wird kleiner und das Bild wird dunkler dargestellt. Alle Funktionen mit $\gamma ' = \frac{1}{\gamma}$ stellen die Umkehrfunktion zur Funktion mit $\gamma$ dar und sind deshalb symmetrisch zur Winkelhalbierenden im ersten Quadranten. Daher verlaufen diese Funktionen oberhalb des Graphen von $f(x)$ und liefern größere Grauwerte und das bearbeitete Bild wird heller dargestellt. Wenn man für $\gamma$ den Wert $1,25$ wählt, erhält man ein Bild, dessen Kontrast bei diesem Beispiel am realistischsten wirkt (siehe Abbildung \ref{ObstkorbGamma1_25}).\\  
 	
 	\section{Korrektheit/Genauigkeit}
 	 
@@ -273,5 +273,4 @@
 	% Beispiel: CR2 ist ein Register der x86-Architektur~\cite{intel2017man}.
 	\bibliographystyle{plain}
 	\bibliography{Ausarbeitung}{}
-	\printbibliography
 \end{document}
