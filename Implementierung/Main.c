@@ -148,6 +148,7 @@ int main(int argc, char *argv[]){
         double compareTime = calculateCompareTime(arr1, width, height, gamma, benchmarkIterations) / benchmarkIterations;
         printf("Optimized: %f\nNormal: %f\n",time, compareTime);
         aligned_free(arr2);
+        free(arr1);
         exit(EXIT_SUCCESS);
     }
 
@@ -183,6 +184,7 @@ int main(int argc, char *argv[]){
             printf("Error while saving image.\n");
             exit(EXIT_FAILURE);
         }
+        free(picture);
         exit(EXIT_SUCCESS);
     }
 

@@ -104,6 +104,8 @@ int testGamma(float gamma, char* outputPath) {
     //Saving the picture to look at it with gamma=1
     writeFileIfPathNotEmpty(outputPath, result);
     //Print information about the test:
+    free(compare);
+    free(original);
     printf("Test with gamma=%f\n", gamma);
     return evaluateTestResults(original, compare, result);
 }
@@ -162,6 +164,7 @@ int testImage(char *path, float gamma, char* outputPath) {
         //Just test with given gamma value
         if (testImageGamma(original, gamma, outputPath) != 0) {
             printf("Test failed with gamma=%f\n", gamma);
+            free(original);
             return -1;
         }
     } else {
@@ -176,12 +179,14 @@ int testImage(char *path, float gamma, char* outputPath) {
             if (testResult != 0) {
                 //If one tests fails the whole test fails.
                 printf("Test failed with gamma=%f\n", i);
+                free(original);
                 return -1;
             }
         }
     }
     //Otherwise it passed the test
     printf("Everything worked as expected.\n");
+    free(original);
     return 0;
 }
 
