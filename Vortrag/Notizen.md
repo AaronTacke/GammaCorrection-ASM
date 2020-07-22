@@ -1,4 +1,5 @@
-#Optimierung der Gammakorrektur
+# Optimierung der Gammakorrektur
+
 -Wertebereich und Definitionsbereich von 0 bis 255
 -Nur ganze Zahlen -> endlich viele Funktionen
 -Waren doch 65.000 Funktionen (mit Gamma-Intervallen)
@@ -36,4 +37,37 @@
 -Zahlenfolge erhält alle Informationen um Funktion zu konstruieren, aber wie?
 -f(x) ist Anzahl der Nullen vor x-ter 1
 -Beispiel3...
--Wie man das Kodieren effizient gestaltet sagt Philip
+-Wie man das Dekodieren effizient gestaltet sagt Philip
+
+-Dekodieren durch SIMD
+-ByteMask erstellen für alle words <= zCounter
+-ByteMask mit nCounter*256 verunden
+-ByteMask mit Bytes verodern
+-f(x) Wert steht an passender Stelle
+-Dekodieren durch Binäre Suche der Position mit x-ter 1
+-Zur Zeit: Zu langsam
+-Nur schnell genug mit eigenem Befehl, den es (noch) nicht gibt.
+
+- Optimierung des Graustufenfilters durch:
+- SIMD Berechnung
+- Alignment
+- deutliche Verbesserung an Kurve zu erkennen
+- Optimierung der Gammakorrektur durch:
+- Hardcoded functions
+- Bisection
+- Merge-Verfahren, bei dem gesamte Funktion berechnet wird
+- Optimierungsschritte:
+- Graustufenfilter mit SIMD und Alignment
+- Alle Funktionen mit Gamma Intervallen berechnet
+- Binäre Suche zum Finden einer Funktion
+- Gamma als Bruch -> Newtonverfahren
+- Bisektion mit Zähler und Nenner als Exponenten
+- Rechnen auf Exponenten
+- Berechnen der gesamten Funktion durch Bisektion
+- Berechnung durch eine einzige Schleife
+- Ausblick: Zugriff auf Kodierte Funktion im Register
+- Zusammenfassung:
+- mathematisch korrekte Berechnung aller Gammafunktionen, die mit dem Datentyp float darstellbar sind
+- Schneller und schöner als hardgecodete Funktionen(Compilezeit)
+- 10 mal schneller als C-Standardimplementierung
+- Ziel, ein effizientes Porgramm für die Gammakorrektur mit Grastufenfilter zu erstellen erreicht
