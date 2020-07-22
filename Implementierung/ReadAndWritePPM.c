@@ -163,10 +163,9 @@ void writePicture(char* path, uint8_t image[]) {
     }
 //#######################################################################################
 
-
-
+    //This method is used to align an pixel-array before calculating. This ensures that the read and write operations can be much faster.
     uint8_t *alignArray(uint8_t* oldArray){
-        uint8_t* pixels = (uint8_t*) aligned_malloc(1.2 * width * height * 3 * sizeof(uint8_t)+15, 64);
+        uint8_t* pixels = (uint8_t*) aligned_malloc(1.2 * width * height * 3 * sizeof(uint8_t)+15, 16);
         if(pixels==NULL){
             printf("Error when allocating aligned memory. Please choose smaller image or insert bigger RAM\n");
         }
@@ -179,6 +178,7 @@ void writePicture(char* path, uint8_t image[]) {
         }
         return pixels;
     }
+    //This method is used to unalign an calculated array, to make it comparable to the c implementation.
     uint8_t *unalignArray(uint8_t* alignedArray){
         uint8_t* pixels = (uint8_t*) malloc(width * height * 3 * sizeof(uint8_t)+15);
         if(pixels==NULL){
