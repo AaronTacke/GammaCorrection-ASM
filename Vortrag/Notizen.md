@@ -1,0 +1,39 @@
+#Optimierung der Gammakorrektur
+-Wertebereich und Definitionsbereich von 0 bis 255
+-Nur ganze Zahlen -> endlich viele Funktionen
+-Waren doch 65.000 Funktionen (mit Gamma-Intervallen)
+-Sehr schnell, aber unschön
+-Ziel: Schneller und Schöner
+-Problem: Fließkomma-Potenz
+-Deshalb: gamma als Bruch aus natürlichen Zahlen darstellen
+-Wurzelberechnung mit Newtonverfahren -> Ineffizient
+-Binäre suche nach passendem Wert:
+	-Bei großen Werten zu langsam
+	-Bei kleinen Werten zu ungenau
+-Rechnen auf Exponenten mit Hilfsfunktion l(z)
+-f(x) ist maximale natürliche Zahl, dessen l-Wert kleiner ist als l(x)*Gamma
+-Algorithmus 1:
+	-Speichere Werte für l(x)
+	-Berechne l(x)*Gamma
+	-Suche f(x) binär (max. 8 Vergleiche)
+-Schnell aber nicht schnell genug
+-Deshalb: Funktionswerte vorher berechnen
+-Optimieren durch Monotonie:
+-f(x) = f(x-1)+d
+-d ist die Anazhl der natürlichen Zahlen, mit
+	-d ist größer als f(x-1)
+	-l(d) ist kleiner gleich l(x)*Gamma
+-Beispiel...
+-Algorithmus:
+-Spalten als Arrays, sortiertes durchlaufen wie bei Merge
+-Links kleiner: Counter erhöhen, Rechts kleiner: Funktionswert speichern
+-510 Lesezugriffe und Vergleiche, 255 Schreibzugriffe und Multiplikationen
+-Beispiel2...
+-Geschwindigkeit wurde viel besser aber nicht schnell genug
+-Probem: Speicherzugriffe
+-Kodieren der Funktionen möglich?
+-Statt counter erhöhen 0 schreiben, statt Funktionswert schreiben 1
+-Zahlenfolge erhält alle Informationen um Funktion zu konstruieren, aber wie?
+-f(x) ist Anzahl der Nullen vor x-ter 1
+-Beispiel3...
+-Wie man das Kodieren effizient gestaltet sagt Philip
