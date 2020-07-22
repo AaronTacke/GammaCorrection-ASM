@@ -104,10 +104,11 @@ int testGamma(float gamma, char* outputPath) {
     //Saving the picture to look at it with gamma=1
     writeFileIfPathNotEmpty(outputPath, result);
     //Print information about the test:
+    int resultNumber = evaluateTestResults(original, compare, result);
     free(compare);
     free(original);
     printf("Test with gamma=%f\n", gamma);
-    return evaluateTestResults(original, compare, result);
+    return resultNumber;
 }
 
 //Tests the image (given as parameter) with the given gamma value
@@ -122,8 +123,10 @@ int testImageGamma(uint8_t *original, float gamma, char* outputPath) {
     //Saving the picture to look at it with gamma=1
     writeFileIfPathNotEmpty(outputPath, result);
     //Print information about the test:
+    int resultNumber = evaluateTestResults(original, compare, result);
+    free(compare);
     printf("Test with gamma=%f\n", gamma);
-    return evaluateTestResults(original, compare, result);
+    return resultNumber;
 }
 
 //Test the standard image with different gamma values
